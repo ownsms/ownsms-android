@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">ownsms</string>
+
+    <!-- Tabs / top bar (AppRoot.kt) -->
+    <string name="tab_home_label">Asosiy</string>
+    <string name="tab_activity">Faollik</string>
+    <string name="tab_sims_label">SIM</string>
+    <string name="tab_sims_title">SIM kartalar</string>
+    <string name="tab_settings_label">Sozlama</string>
+    <string name="tab_settings_title">Sozlamalar</string>
+
+    <!-- Onboarding (OnboardingScreen.kt) -->
+    <string name="onboarding_subtitle">Telefoningizni ulang va o\'z SIM\'ingiz orqali API bilan SMS yuboring.</string>
+    <string name="onboarding_api_url_label">API URL (masalan: https://sms.omadli.uz)</string>
+    <string name="onboarding_register_btn">Yangi qurilma ro\'yxatdan o\'tkazish</string>
+    <string name="onboarding_or_join">yoki mavjud akkauntga qo\'shilish</string>
+    <string name="onboarding_pair_code_label">Pairing kod</string>
+    <string name="onboarding_pair_btn">Pairing kod bilan qo\'shilish</string>
+    <string name="onboarding_request_perms_btn">Ruxsatlarni oldindan berish</string>
+
+    <!-- Status labels (shared across Home / Activity / StatusChip) -->
+    <string name="status_queued">Navbatda</string>
+    <string name="status_sending">Yuborilmoqda</string>
+    <string name="status_sent">Yuborildi</string>
+    <string name="status_delivered">Yetkazildi</string>
+    <string name="status_failed">Xato</string>
+    <string name="status_expired">Muddati o\'tdi</string>
+    <string name="status_filter_all">Barchasi</string>
+
+    <!-- Home (HomeScreen.kt) -->
+    <string name="home_status_active">Faol — xabarlar kutilmoqda</string>
+    <string name="home_status_off">O\'chiq</string>
+    <string name="home_stop_btn">To\'xtatish</string>
+    <string name="home_start_btn">Boshlash</string>
+    <string name="home_missing_perms_notice">⚠  Ba\'zi ruxsat/sozlamalar yetishmaydi — Sozlamalarni oching</string>
+    <string name="home_recent_count">So\'nggi %1$d ta xabar bo\'yicha</string>
+    <string name="home_server_online">Server: qurilma onlayn</string>
+    <string name="home_server_offline">Server: qurilma oflayn</string>
+    <string name="home_today_sms">Bugungi SMS</string>
+
+    <!-- Activity (ActivityScreen.kt) -->
+    <string name="activity_source_local">Bu qurilma</string>
+    <string name="activity_source_server">Server</string>
+    <string name="activity_no_api_key">API kalit yo\'q — Sozlamalar bo\'limida ro\'yxatdan o\'ting.</string>
+    <string name="activity_empty_local">Bu yerda xabar yo\'q. Yuborilgan SMS\'lar shu ro\'yxatda paydo bo\'ladi.</string>
+    <string name="activity_server_all_messages">Hisob bo\'yicha barcha xabarlar</string>
+    <string name="activity_server_empty">Bu hisobda hali xabar yo\'q.</string>
+    <string name="activity_load_more">Ko\'proq yuklash</string>
+    <string name="activity_row_sim">SIM: %1$s</string>
+    <string name="activity_row_segments">Segmentlar: %1$d</string>
+
+    <!-- Common / detail rows (shared across dialogs) -->
+    <string name="common_refresh">Yangilash</string>
+    <string name="common_close">Yopish</string>
+    <string name="detail_status_label">Holat</string>
+    <string name="detail_error_code_label">Xato kodi</string>
+    <string name="detail_segments_label">Segmentlar</string>
+    <string name="detail_time_label">Vaqt</string>
+    <string name="detail_sender_sim_label">Yuboruvchi SIM</string>
+
+    <!-- Sims (SimsScreen.kt) -->
+    <string name="sims_empty">SIM topilmadi. Telefon ruxsatini bering (Sozlamalar) va yangilang.</string>
+    <string name="sims_slot_sub_format">slot %1$d · sub %2$d</string>
+    <string name="sims_default_note">Tanlangan SIM standart (default) hisoblanadi.</string>
+
+    <!-- Settings (SettingsScreen.kt) -->
+    <string name="settings_readiness_title">Tayyorlik</string>
+    <string name="settings_request_perms_btn">Ruxsatlarni so\'rash</string>
+    <string name="settings_disable_battery_btn">Batareya optimizatsiyasini o\'chirish</string>
+    <string name="settings_oem_autostart_btn">OEM Autostart sozlamasi</string>
+    <string name="settings_server_title">Server</string>
+    <string name="settings_api_url_label">API URL</string>
+    <string name="settings_save_url_btn">URL saqlash</string>
+    <string name="settings_account_title">Akkaunt</string>
+    <string name="settings_apikey_label">API KEY (serveringiz uchun):</string>
+    <string name="settings_generate_pair_btn">Yangi qurilma uchun pairing kod</string>
+    <string name="settings_test_sms_title">Test SMS</string>
+    <string name="settings_test_sms_notice">Bitta test SMS yuboring — yuboruvchi xizmat (service) ishga tushirilgan bo\'lishi kerak.</string>
+    <string name="settings_phone_label">Telefon raqami</string>
+    <string name="settings_test_text_label">Matn (ixtiyoriy)</string>
+    <string name="settings_send_test_btn">Test SMS yuborish</string>
+
+    <!-- Actions / feedback (CopyableField, AppRoot, UiUtil) -->
+    <string name="action_menu">Menyu</string>
+    <string name="action_copy">Nusxa olish</string>
+    <string name="action_reveal">Ko\'rsatish</string>
+    <string name="action_hide">Yashirish</string>
+    <string name="copied">Nusxa olindi</string>
+    <string name="no_browser">Brauzer topilmadi</string>
+
+    <!-- Drawer (AppDrawer.kt) -->
+    <string name="app_tagline">O\'z SIM\'ingiz orqali SMS API</string>
+    <string name="drawer_about">Ilova haqida</string>
+    <string name="drawer_guide">Foydalanish yo\'riqnomasi</string>
+    <string name="drawer_api_docs">API hujjatlari</string>
+    <string name="drawer_version">Versiya %1$s</string>
+
+    <!-- About (AboutScreen.kt) -->
+    <string name="about_what_title">Bu nima?</string>
+    <string name="about_what_body">ownsms — o\'z telefoningiz SIM\'i orqali oddiy REST API bilan SMS yuborish imkonini beradi. Uchinchi tomon SMS-shlyuzi kerak emas: xabarni API orqali yuborasiz, ushbu telefon uni o\'z SIM\'idan jo\'natadi.</string>
+    <string name="about_how_title">Qanday ishlaydi?</string>
+    <string name="about_how_body">1. Serveringizga API so\'rov yuborasiz.\n2. Ushbu ilova serverdan yangi xabarlarni kutib turadi.\n3. Telefon SMS\'ni o\'z SIM\'i orqali yuboradi va holatini serverga qaytaradi.</string>
+    <string name="about_website_btn">Veb-sayt — ownsms.uz</string>
+
+    <!-- Guide (GuideScreen.kt) -->
+    <string name="guide_intro">Quyidagi 5 qadamda telefoningizni SMS yuborishga tayyorlang.</string>
+    <string name="guide_step1_title">Ruxsat va SIM</string>
+    <string name="guide_step1_body">Sozlamalar bo\'limida SMS va telefon ruxsatlarini bering, batareya optimizatsiyasini o\'chiring. SIM bo\'limida standart SIM\'ni tanlang.</string>
+    <string name="guide_step2_title">API URL</string>
+    <string name="guide_step2_body">Server manzilini kiriting, masalan: https://sms.omadli.uz</string>
+    <string name="guide_step3_title">Ro\'yxatdan o\'tish</string>
+    <string name="guide_step3_body">«Yangi qurilma ro\'yxatdan o\'tkazish» tugmasini bosing. Qurilma serverga ulanadi va API kalit oladi.</string>
+    <string name="guide_step4_title">API kalitni oling</string>
+    <string name="guide_step4_body">Sozlamalar → Akkaunt bo\'limida API kalitni ko\'z tugmasi bilan oching va nusxa oling.</string>
+    <string name="guide_step5_title">SMS yuboring</string>
+    <string name="guide_step5_body">API kalit bilan quyidagi so\'rovni yuboring — telefon SMS\'ni o\'z SIM\'idan jo\'natadi.</string>
+    <string name="guide_curl_label">cURL misoli (nusxa olib ishlating):</string>
+</resources>

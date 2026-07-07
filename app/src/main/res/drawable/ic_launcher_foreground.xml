@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Adaptive icon foreground on the Ultramarine background: a white chat bubble with a green
+     double-tick (✓✓) — the "message delivered" motif that runs through the app's status UI.
+     Centered within the 108dp canvas's safe zone (inner 72dp) so launcher masks don't clip it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- White speech bubble (tail at bottom-left). -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,30h48a8,8 0 0 1 8,8v24a8,8 0 0 1 -8,8h-30l-14,12v-12h-4a8,8 0 0 1 -8,-8v-24a8,8 0 0 1 8,-8z" />
+    <!-- Green double-tick inside the bubble (delivered motif). -->
+    <path
+        android:strokeColor="#16C784"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M38,50l6,7l13,-15" />
+    <path
+        android:strokeColor="#16C784"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M50,50l6,7l13,-15" />
+</vector>

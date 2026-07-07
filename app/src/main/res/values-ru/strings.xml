@@ -1,0 +1,118 @@
+<resources>
+    <string name="app_name">ownsms</string>
+
+    <!-- Tabs / top bar (AppRoot.kt) -->
+    <string name="tab_home_label">Главная</string>
+    <string name="tab_activity">Активность</string>
+    <string name="tab_sims_label">SIM</string>
+    <string name="tab_sims_title">SIM-карты</string>
+    <string name="tab_settings_label">Настройки</string>
+    <string name="tab_settings_title">Настройки</string>
+
+    <!-- Onboarding (OnboardingScreen.kt) -->
+    <string name="onboarding_subtitle">Подключите телефон и отправляйте SMS через API с помощью своей SIM-карты.</string>
+    <string name="onboarding_api_url_label">API URL (например: https://sms.omadli.uz)</string>
+    <string name="onboarding_register_btn">Зарегистрировать новое устройство</string>
+    <string name="onboarding_or_join">или присоединиться к существующему аккаунту</string>
+    <string name="onboarding_pair_code_label">Код сопряжения</string>
+    <string name="onboarding_pair_btn">Присоединиться по коду сопряжения</string>
+    <string name="onboarding_request_perms_btn">Запросить разрешения заранее</string>
+
+    <!-- Status labels (shared across Home / Activity / StatusChip) -->
+    <string name="status_queued">В очереди</string>
+    <string name="status_sending">Отправляется</string>
+    <string name="status_sent">Отправлено</string>
+    <string name="status_delivered">Доставлено</string>
+    <string name="status_failed">Ошибка</string>
+    <string name="status_expired">Истёк срок</string>
+    <string name="status_filter_all">Все</string>
+
+    <!-- Home (HomeScreen.kt) -->
+    <string name="home_status_active">Активно — ожидание сообщений</string>
+    <string name="home_status_off">Выключено</string>
+    <string name="home_stop_btn">Остановить</string>
+    <string name="home_start_btn">Запустить</string>
+    <string name="home_missing_perms_notice">⚠  Не хватает разрешений/настроек — откройте Настройки</string>
+    <string name="home_recent_count">По последним %1$d сообщениям</string>
+    <string name="home_server_online">Сервер: устройство онлайн</string>
+    <string name="home_server_offline">Сервер: устройство офлайн</string>
+    <string name="home_today_sms">SMS за сегодня</string>
+
+    <!-- Activity (ActivityScreen.kt) -->
+    <string name="activity_source_local">Это устройство</string>
+    <string name="activity_source_server">Сервер</string>
+    <string name="activity_no_api_key">Нет API-ключа — зарегистрируйтесь в разделе Настройки.</string>
+    <string name="activity_empty_local">Сообщений пока нет. Отправленные SMS появятся в этом списке.</string>
+    <string name="activity_server_all_messages">Все сообщения по аккаунту</string>
+    <string name="activity_server_empty">В этом аккаунте пока нет сообщений.</string>
+    <string name="activity_load_more">Загрузить ещё</string>
+    <string name="activity_row_sim">SIM: %1$s</string>
+    <string name="activity_row_segments">Сегменты: %1$d</string>
+
+    <!-- Common / detail rows (shared across dialogs) -->
+    <string name="common_refresh">Обновить</string>
+    <string name="common_close">Закрыть</string>
+    <string name="detail_status_label">Статус</string>
+    <string name="detail_error_code_label">Код ошибки</string>
+    <string name="detail_segments_label">Сегменты</string>
+    <string name="detail_time_label">Время</string>
+    <string name="detail_sender_sim_label">SIM отправителя</string>
+
+    <!-- Sims (SimsScreen.kt) -->
+    <string name="sims_empty">SIM-карты не найдены. Предоставьте разрешение (Настройки) и обновите.</string>
+    <string name="sims_slot_sub_format">слот %1$d · sub %2$d</string>
+    <string name="sims_default_note">Выбранная SIM-карта считается стандартной (по умолчанию).</string>
+
+    <!-- Settings (SettingsScreen.kt) -->
+    <string name="settings_readiness_title">Готовность</string>
+    <string name="settings_request_perms_btn">Запросить разрешения</string>
+    <string name="settings_disable_battery_btn">Отключить оптимизацию батареи</string>
+    <string name="settings_oem_autostart_btn">Настройка автозапуска OEM</string>
+    <string name="settings_server_title">Сервер</string>
+    <string name="settings_api_url_label">API URL</string>
+    <string name="settings_save_url_btn">Сохранить URL</string>
+    <string name="settings_account_title">Аккаунт</string>
+    <string name="settings_apikey_label">API KEY (для вашего сервера):</string>
+    <string name="settings_generate_pair_btn">Код сопряжения для нового устройства</string>
+    <string name="settings_test_sms_title">Тестовое SMS</string>
+    <string name="settings_test_sms_notice">Отправьте одно тестовое SMS — служба отправки должна быть запущена.</string>
+    <string name="settings_phone_label">Номер телефона</string>
+    <string name="settings_test_text_label">Текст (необязательно)</string>
+    <string name="settings_send_test_btn">Отправить тестовое SMS</string>
+
+    <!-- Actions / feedback (CopyableField, AppRoot, UiUtil) -->
+    <string name="action_menu">Меню</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_reveal">Показать</string>
+    <string name="action_hide">Скрыть</string>
+    <string name="copied">Скопировано</string>
+    <string name="no_browser">Браузер не найден</string>
+
+    <!-- Drawer (AppDrawer.kt) -->
+    <string name="app_tagline">SMS API через вашу SIM-карту</string>
+    <string name="drawer_about">О приложении</string>
+    <string name="drawer_guide">Руководство пользователя</string>
+    <string name="drawer_api_docs">Документация API</string>
+    <string name="drawer_version">Версия %1$s</string>
+
+    <!-- About (AboutScreen.kt) -->
+    <string name="about_what_title">Что это?</string>
+    <string name="about_what_body">ownsms позволяет отправлять SMS через SIM-карту вашего телефона с помощью простого REST API. Сторонний SMS-шлюз не нужен: вы отправляете сообщение через API, а этот телефон шлёт его со своей SIM-карты.</string>
+    <string name="about_how_title">Как это работает?</string>
+    <string name="about_how_body">1. Вы отправляете API-запрос на ваш сервер.\n2. Это приложение ожидает новые сообщения от сервера.\n3. Телефон отправляет SMS со своей SIM-карты и возвращает статус серверу.</string>
+    <string name="about_website_btn">Веб-сайт — ownsms.uz</string>
+
+    <!-- Guide (GuideScreen.kt) -->
+    <string name="guide_intro">Подготовьте телефон к отправке SMS за 5 шагов.</string>
+    <string name="guide_step1_title">Разрешения и SIM</string>
+    <string name="guide_step1_body">В Настройках дайте разрешения на SMS и телефон, отключите оптимизацию батареи. В разделе SIM выберите SIM по умолчанию.</string>
+    <string name="guide_step2_title">API URL</string>
+    <string name="guide_step2_body">Введите адрес сервера, например: https://sms.omadli.uz</string>
+    <string name="guide_step3_title">Регистрация</string>
+    <string name="guide_step3_body">Нажмите «Зарегистрировать новое устройство». Устройство подключится к серверу и получит API-ключ.</string>
+    <string name="guide_step4_title">Получите API-ключ</string>
+    <string name="guide_step4_body">В Настройки → Аккаунт откройте API-ключ кнопкой с глазом и скопируйте его.</string>
+    <string name="guide_step5_title">Отправьте SMS</string>
+    <string name="guide_step5_body">Отправьте запрос ниже с API-ключом — телефон отправит SMS со своей SIM-карты.</string>
+    <string name="guide_curl_label">Пример cURL (скопируйте и используйте):</string>
+</resources>

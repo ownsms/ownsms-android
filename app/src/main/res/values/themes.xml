@@ -1,0 +1,5 @@
+<resources>
+    <!-- Pure-Compose app: a minimal framework theme (no Material XML dependency needed).
+         Actual UI styling is the Material3 Compose theme in MainActivity. -->
+    <style name="Theme.OwnSms" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
