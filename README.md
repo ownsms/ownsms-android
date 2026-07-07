@@ -1,6 +1,11 @@
 # ownsms-android
 
-Native Android (Kotlin) **sender** app for [ownsms](https://ownsms.uz): registers a phone with an
+[![CI](https://github.com/ownsms/ownsms-android/actions/workflows/android.yml/badge.svg)](https://github.com/ownsms/ownsms-android/actions/workflows/android.yml)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![minSdk 26](https://img.shields.io/badge/minSdk-26-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![Compose](https://img.shields.io/badge/Jetpack%20Compose-Material%203-2952E3?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+
+Native Android (Kotlin) **sender** app for [ownsms](https://ownsms.omadli.uz): registers a phone with an
 ownsms backend, long-polls for queued SMS, and sends them through the phone's own SIM.
 
 > Status: **beta.** Build it in Android Studio and run on a **real device** (the SMS-via-SIM path
@@ -56,7 +61,7 @@ compiles but needs a device/emulator), a real signing keystore for Play upload.
 2. Tap **SMS / Telefon / Bildirishnoma ruxsati** and grant all.
 3. Tap **Batareya optimizatsiyasini o'chirish** and allow.
 4. On Xiaomi/Huawei/Oppo/Vivo: open app settings and enable **Autostart** manually.
-5. Enter the **API URL** (your ngrok `https://...` or `https://api.ownsms.uz`), tap **URL saqlash**.
+5. Enter the **API URL** (e.g. `https://sms.omadli.uz`), tap **URL saqlash**.
 6. Tap **Yangi qurilma ro'yxatdan o'tkazish** — the app registers, stores its device token, and
    shows the **API KEY** for your server. (To add a second phone to the same account, tap
    **Yangi qurilma uchun pairing kod** on the first phone, then enter that code under
