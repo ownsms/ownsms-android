@@ -18,6 +18,19 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        // Committed debug keystore (standard debug creds) so every release — local or CI — is
+        // signed with the SAME key. That keeps sideloaded installs updatable in place.
+        // ponytail: this is a debug key, fine for GitHub-distributed builds; swap for a real
+        // release keystore (via CI secrets) before shipping to Play.
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
