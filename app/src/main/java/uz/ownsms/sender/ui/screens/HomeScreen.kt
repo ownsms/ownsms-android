@@ -39,9 +39,8 @@ import java.time.OffsetDateTime
 @Composable
 fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
     val enabled by vm.enabled.collectAsState()
-    val ready by vm.ready.collectAsState()
+    val canStart by vm.canStart.collectAsState()
     val recent by vm.recent.collectAsState()
-    val savedToken by vm.token.collectAsState()
     val apiKey by vm.apiKey.collectAsState()
     val serverStatus by vm.serverStatus.collectAsState()
     val serverMessages by vm.serverMessages.collectAsState()
@@ -82,7 +81,7 @@ fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
                 }
                 Button(
                     onClick = { if (enabled) vm.stop() else vm.start() },
-                    enabled = savedToken.isNotBlank(),
+                    enabled = enabled || canStart,
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -96,7 +95,7 @@ fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
             }
         }
 
-        if (!ready) {
+        if (!enabled && !canStart) {
             Surface(
                 onClick = onOpenSettings,
                 shape = RoundedCornerShape(14.dp),

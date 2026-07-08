@@ -16,6 +16,7 @@ class ReliabilityChecker(private val context: Context) {
         val list = mutableListOf(
             Check("sms", "SMS yuborish ruxsati", granted(Manifest.permission.SEND_SMS)),
             Check("phone", "Telefon/SIM holati ruxsati", granted(Manifest.permission.READ_PHONE_STATE)),
+            Check("phone_numbers", "SIM raqami ruxsati", granted(Manifest.permission.READ_PHONE_NUMBERS)),
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             list.add(Check("notif", "Bildirishnoma ruxsati", granted(Manifest.permission.POST_NOTIFICATIONS)))
@@ -26,6 +27,19 @@ class ReliabilityChecker(private val context: Context) {
 
     /** All hard requirements satisfied. (OEM autostart can't be detected reliably, so it's a hint, not a gate.) */
     fun isReady(): Boolean = checks().all { it.ok }
+
+    /** Mandatory runtime permissions only (battery optimization is a recommendation, not a permission). */
+    fun permissionsGranted(): Boolean {
+        val hard = mutableListOf(
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_PHONE_NUMBERS,
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            hard.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        return hard.all { granted(it) }
+    }
 
     private fun granted(permission: String) = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 

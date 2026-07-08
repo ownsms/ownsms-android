@@ -41,6 +41,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val defaultSubId = MutableStateFlow(settings.defaultSubId)
     val reliability = MutableStateFlow<List<Check>>(emptyList())
     val ready = MutableStateFlow(false)
+
+    /** May the sender be started? Hard-gated on registration + mandatory permissions + a chosen SIM. */
+    val canStart = MutableStateFlow(false)
+
+    /** Mandatory runtime permissions granted — required before registering so SIMs are captured. */
+    val permsGranted = MutableStateFlow(false)
     val oemAggressive: Boolean = OemAutostart.isLikelyAggressive()
     val apiKey = MutableStateFlow(settings.apiKey)
     val message = MutableStateFlow<String?>(null)
@@ -103,12 +109,26 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun refreshSims() {
-        sims.value = simRepo.list()
+        val list = simRepo.list()
+        sims.value = list
+        // Auto-select a valid SIM so single-SIM phones aren't blocked; the user can still change it.
+        if (list.isNotEmpty() && list.none { it.subscriptionId == defaultSubId.value }) {
+            setDefaultSub(list.first().subscriptionId)
+        }
+        recomputeCanStart()
     }
 
     fun refreshReliability() {
         reliability.value = reliabilityChecker.checks()
         ready.value = reliabilityChecker.isReady()
+        permsGranted.value = reliabilityChecker.permissionsGranted()
+        recomputeCanStart()
+    }
+
+    private fun recomputeCanStart() {
+        canStart.value = token.value.isNotBlank() &&
+            reliabilityChecker.permissionsGranted() &&
+            sims.value.any { it.subscriptionId == defaultSubId.value }
     }
 
     fun openOemAutostart() {
@@ -190,11 +210,13 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         baseUrl.value = settings.baseUrl
         token.value = settings.deviceToken
         apiKey.value = settings.apiKey
+        recomputeCanStart()
     }
 
     fun setDefaultSub(subId: Int) {
         defaultSubId.value = subId
         settings.defaultSubId = subId
+        recomputeCanStart()
     }
 
     fun saveUrl(url: String) {
@@ -203,6 +225,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun start() {
+        recomputeCanStart()
+        if (!canStart.value) {
+            message.value = "Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang."
+            return
+        }
         settings.enabled = true
         enabled.value = true
         SenderService.start(getApplication())

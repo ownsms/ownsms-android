@@ -16,7 +16,8 @@
     <string name="onboarding_or_join">или присоединиться к существующему аккаунту</string>
     <string name="onboarding_pair_code_label">Код сопряжения</string>
     <string name="onboarding_pair_btn">Присоединиться по коду сопряжения</string>
-    <string name="onboarding_request_perms_btn">Запросить разрешения заранее</string>
+    <string name="onboarding_request_perms_btn">Выдать разрешения (SMS, SIM, уведомления)</string>
+    <string name="onboarding_perms_ok">✓ Разрешения выданы</string>
 
     <!-- Status labels (shared across Home / Activity / StatusChip) -->
     <string name="status_queued">В очереди</string>
@@ -32,7 +33,7 @@
     <string name="home_status_off">Выключено</string>
     <string name="home_stop_btn">Остановить</string>
     <string name="home_start_btn">Запустить</string>
-    <string name="home_missing_perms_notice">⚠  Не хватает разрешений/настроек — откройте Настройки</string>
+    <string name="home_missing_perms_notice">⚠  Для запуска нужны все разрешения и SIM — откройте Настройки</string>
     <string name="home_recent_count">По последним %1$d сообщениям</string>
     <string name="home_server_online">Сервер: устройство онлайн</string>
     <string name="home_server_offline">Сервер: устройство офлайн</string>

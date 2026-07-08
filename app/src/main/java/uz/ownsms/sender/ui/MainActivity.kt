@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
         val perms = mutableListOf(
             Manifest.permission.SEND_SMS,
             Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.READ_PHONE_NUMBERS,
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             perms.add(Manifest.permission.POST_NOTIFICATIONS)

@@ -16,7 +16,8 @@
     <string name="onboarding_or_join">yoki mavjud akkauntga qo\'shilish</string>
     <string name="onboarding_pair_code_label">Pairing kod</string>
     <string name="onboarding_pair_btn">Pairing kod bilan qo\'shilish</string>
-    <string name="onboarding_request_perms_btn">Ruxsatlarni oldindan berish</string>
+    <string name="onboarding_request_perms_btn">Ruxsatlarni berish (SMS, SIM, bildirishnoma)</string>
+    <string name="onboarding_perms_ok">✓ Ruxsatlar berilgan</string>
 
     <!-- Status labels (shared across Home / Activity / StatusChip) -->
     <string name="status_queued">Navbatda</string>
@@ -32,7 +33,7 @@
     <string name="home_status_off">O\'chiq</string>
     <string name="home_stop_btn">To\'xtatish</string>
     <string name="home_start_btn">Boshlash</string>
-    <string name="home_missing_perms_notice">⚠  Ba\'zi ruxsat/sozlamalar yetishmaydi — Sozlamalarni oching</string>
+    <string name="home_missing_perms_notice">⚠  Ishga tushirish uchun barcha ruxsatlar va SIM kerak — Sozlamalarni oching</string>
     <string name="home_recent_count">So\'nggi %1$d ta xabar bo\'yicha</string>
     <string name="home_server_online">Server: qurilma onlayn</string>
     <string name="home_server_offline">Server: qurilma oflayn</string>

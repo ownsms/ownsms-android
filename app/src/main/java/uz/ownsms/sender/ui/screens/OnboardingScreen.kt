@@ -18,7 +18,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +36,7 @@ import uz.ownsms.sender.ui.MainViewModel
 fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
     val message by vm.message.collectAsState()
     val loading by vm.loading.collectAsState()
+    val permsGranted by vm.permsGranted.collectAsState()
     var url by remember { mutableStateOf(vm.baseUrl.value) }
     var pairCode by remember { mutableStateOf("") }
 
@@ -64,9 +64,18 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         )
 
+        // Grant permissions before registering — that's when the device's SIMs are sent to the server.
+        FilledTonalButton(
+            onClick = onRequestPermissions,
+            enabled = !permsGranted && !loading,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(stringResource(if (permsGranted) R.string.onboarding_perms_ok else R.string.onboarding_request_perms_btn))
+        }
+
         Button(
             onClick = { vm.register(url) },
-            enabled = url.isNotBlank() && !loading,
+            enabled = url.isNotBlank() && permsGranted && !loading,
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -102,14 +111,10 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
         )
         FilledTonalButton(
             onClick = { vm.pairWithCode(url, pairCode) },
-            enabled = url.isNotBlank() && pairCode.isNotBlank() && !loading,
+            enabled = url.isNotBlank() && pairCode.isNotBlank() && permsGranted && !loading,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.onboarding_pair_btn))
-        }
-
-        TextButton(onClick = onRequestPermissions, enabled = !loading, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.onboarding_request_perms_btn))
         }
 
         message?.let {
