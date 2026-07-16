@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Campaign
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
@@ -46,6 +48,7 @@ import uz.ownsms.sender.R
 import uz.ownsms.sender.ui.components.AppDrawer
 import uz.ownsms.sender.ui.screens.AboutScreen
 import uz.ownsms.sender.ui.screens.ActivityScreen
+import uz.ownsms.sender.ui.screens.BulkScreen
 import uz.ownsms.sender.ui.screens.GuideScreen
 import uz.ownsms.sender.ui.screens.HomeScreen
 import uz.ownsms.sender.ui.screens.OnboardingScreen
@@ -55,6 +58,7 @@ import uz.ownsms.sender.ui.screens.SimsScreen
 private enum class Tab(val route: String, val labelRes: Int, val titleRes: Int, val icon: ImageVector) {
     HOME("home", R.string.tab_home_label, R.string.app_name, Icons.Filled.Home),
     ACTIVITY("activity", R.string.tab_activity, R.string.tab_activity, Icons.AutoMirrored.Filled.List),
+    BULK("bulk", R.string.tab_bulk_label, R.string.tab_bulk_title, Icons.Filled.Campaign),
     SIMS("sims", R.string.tab_sims_label, R.string.tab_sims_title, Icons.Filled.Call),
     SETTINGS("settings", R.string.tab_settings_label, R.string.tab_settings_title, Icons.Filled.Settings),
 }
@@ -67,7 +71,13 @@ private val EXPANDED_WIDTH = 600.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery: () -> Unit) {
+fun AppRoot(
+    vm: MainViewModel,
+    bulkVm: BulkViewModel,
+    accountVm: AccountViewModel,
+    onRequestPermissions: () -> Unit,
+    onIgnoreBattery: () -> Unit,
+) {
     val savedToken by vm.token.collectAsState()
     if (savedToken.isBlank()) {
         OnboardingScreen(vm, onRequestPermissions)
@@ -91,7 +101,9 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
         else -> R.string.app_name
     }
 
-    fun selectTab(route: String) {
+    // Single navigation path for both bottom-nav and drawer: pop back to the start
+    // destination so the back stack never grows past [home, X] and Back always reaches home.
+    fun go(route: String) {
         nav.navigate(route) {
             popUpTo(nav.graph.findStartDestination().id) { saveState = true }
             launchSingleTop = true
@@ -101,7 +113,7 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
 
     fun openFromDrawer(route: String) {
         scope.launch { drawerState.close() }
-        nav.navigate(route) { launchSingleTop = true }
+        go(route)
     }
 
     ModalNavigationDrawer(
@@ -126,8 +138,18 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
                     CenterAlignedTopAppBar(
                         title = { Text(stringResource(titleRes)) },
                         navigationIcon = {
-                            IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                                Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.action_menu))
+                            // Drawer routes (about/guide) show a back arrow; tab roots show the menu.
+                            if (currentTab == null) {
+                                IconButton(onClick = { nav.popBackStack() }) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = stringResource(R.string.action_back),
+                                    )
+                                }
+                            } else {
+                                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                    Icon(Icons.Filled.Menu, contentDescription = stringResource(R.string.action_menu))
+                                }
                             }
                         },
                     )
@@ -139,7 +161,7 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
                                 val label = stringResource(tab.labelRes)
                                 NavigationBarItem(
                                     selected = current == tab.route,
-                                    onClick = { selectTab(tab.route) },
+                                    onClick = { go(tab.route) },
                                     icon = { Icon(tab.icon, contentDescription = label) },
                                     label = { Text(label) },
                                 )
@@ -155,7 +177,7 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
                                 val label = stringResource(tab.labelRes)
                                 NavigationRailItem(
                                     selected = current == tab.route,
-                                    onClick = { selectTab(tab.route) },
+                                    onClick = { go(tab.route) },
                                     icon = { Icon(tab.icon, contentDescription = label) },
                                     label = { Text(label) },
                                 )
@@ -170,12 +192,13 @@ fun AppRoot(vm: MainViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery
                             modifier = Modifier.widthIn(max = 640.dp).fillMaxSize().align(Alignment.TopCenter),
                         ) {
                             composable(Tab.HOME.route) {
-                                HomeScreen(vm, onOpenSettings = { selectTab(Tab.SETTINGS.route) })
+                                HomeScreen(vm, onOpenSettings = { go(Tab.SETTINGS.route) })
                             }
                             composable(Tab.ACTIVITY.route) { ActivityScreen(vm) }
+                            composable(Tab.BULK.route) { BulkScreen(bulkVm) }
                             composable(Tab.SIMS.route) { SimsScreen(vm) }
                             composable(Tab.SETTINGS.route) {
-                                SettingsScreen(vm, onRequestPermissions, onIgnoreBattery)
+                                SettingsScreen(vm, accountVm, onRequestPermissions, onIgnoreBattery)
                             }
                             composable(ROUTE_ABOUT) { AboutScreen() }
                             composable(ROUTE_GUIDE) { GuideScreen(vm) }

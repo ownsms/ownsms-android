@@ -220,6 +220,65 @@ fun effectiveConfig(server: SimConfig, o: Overrides): SimConfig
 Override **global** — barcha SIM'larga bitta to'plam, per-SIM emas (asosan bitta default SIM'dan yuboriladi).
 Skipped: ish soatlari (`work_hours_start/end`) — so'ralmagan; per-SIM override — kerak bo'lsa keyin.
 
+### 3c. Akkaunt boshqaruvi (api_key bilan yoziladigan hamma narsa)
+
+`api_key` (Bearer `osk_...`) bilan **haqiqatan o'zgaradigan** yagona sozlamalar shular. Qolgani
+(akkaunt nomi/email/status, per-SIM rate/kvota) **faqat Django admin** — ilovaga qo'yilmaydi
+(ishlamaydigan tugma bo'lardi).
+
+**API kalitlari** (`GET`/`POST /api/v1/keys`, `POST /api/v1/keys/{id}/revoke`) — yangi karta:
+
+- Ro'yxat: har kalit — `prefix`, `name`, `scopes`, `ip_allowlist`, `revoked`, `created_at`.
+  To'liq token **ko'rsatilmaydi** (server saqlamaydi, faqat `prefix`).
+- Yangi kalit: `name`, `scopes` (send/read checkbox), **`ip_allowlist`** (vergul bilan IP/CIDR).
+  Javob `201` — to'liq `osk_...` **bir marta** ko'rsatiladi → `CopyableField` (mavjud komponent).
+- Bekor qilish: `revoke` tugmasi. Un-revoke yo'q (backend'da ham yo'q).
+
+> **IP allowlist yangilanmaydi.** Faqat kalit yaratishда beriladi (`views/keys.py:47`), update endpoint yo'q.
+> Ilova "o'zgartirish" o'rniga: yangi kalit (yangi allowlist bilan) yasab, eskisini bekor qilishni
+> taklif qiladi. Buni UI matnida aniq yozish kerak, aks holda foydalanuvchi update kutadi.
+
+**Webhook** (`GET`/`PUT /api/v1/webhook`) — yangi karta:
+
+- `url` (maydon), `events` (checkbox: `message.sent`, `message.delivered`, `message.failed`),
+  `enabled` (switch). `PUT` shu uchtasini qabul qiladi.
+- `secret` — **faqat o'qish**, `CopyableField(masked=true)`. HMAC imzo kaliti, `PUT` o'zgartira olmaydi
+  (server avto-generatsiya qiladi).
+
+**Qurilmalar** (`GET /api/v1/devices`, `POST /api/v1/devices/{id}/{act}`) — yangi karta:
+
+- Ro'yxat: `name`, `status`, `online`, `last_seen`, `app_version`.
+- Har biri: **Faollashtirish / O'chirish** (`activate`/`deactivate`). Boshqa amal yo'q.
+
+**Audit jurnali** (`GET /api/v1/audit`, `read` scope) — yangi karta, **faqat o'qish**:
+
+- Oxirgi 100 yozuv: `actor`, `action`, `target`, `ip`, `at`. Filtr yo'q. "Kim, qachon, qayerdan" ko'rinadi.
+
+API (`data/remote/DevApi.kt`):
+
+```kotlin
+@GET("api/v1/keys")               suspend fun keys(): KeysList
+@POST("api/v1/keys")              suspend fun createKey(@Body b: CreateKeyReq): CreatedKey
+@POST("api/v1/keys/{id}/revoke")  suspend fun revokeKey(@Path("id") id: String): ApiKeyInfo
+@GET("api/v1/webhook")            suspend fun webhook(): WebhookConfig
+@PUT("api/v1/webhook")            suspend fun putWebhook(@Body b: WebhookPut): WebhookConfig
+@GET("api/v1/devices")            suspend fun devices(): DevicesList
+@POST("api/v1/devices/{id}/{act}") suspend fun deviceAction(@Path("id") id: String, @Path("act") act: String): DeviceInfo
+@GET("api/v1/audit")              suspend fun audit(): AuditList
+```
+
+Barcha DTO snake_case (Moshi reflective). `scopes`/`events`/`ip_allowlist` — `List<String>`.
+
+> **Xavfsizlik eslatmasi (kodga emas, foydalanuvchiga):** webhook `secret` har qanday amaldagi
+> kalitga ko'rinadi; `read`-kalit ham yangi `send`-kalit yasay oladi (backend scope-subset
+> tekshirmaydi). Bu backend xatti-harakati — ilova o'zgartirmaydi, faqat mavjud endpointlarni ochadi.
+
+### Sozlamalar ekrani yakuniy tartibi
+
+Kartalar (hozirgi 4 + yangi 5): Tayyorlik · Server · Akkaunt (API kalit + pairing) · **Yuborish tezligi** ·
+**API kalitlari** · **Webhook** · **Qurilmalar** · **Audit** · Test SMS. Uzun bo'lgani uchun
+har biri yig'iladigan (`ExpandableCard`) — faqat sarlavhalar ko'rinadi, bosilganda ochiladi.
+
 ---
 
 ## Testlar

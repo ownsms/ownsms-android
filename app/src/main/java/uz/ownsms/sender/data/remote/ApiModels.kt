@@ -109,3 +109,102 @@ data class DeviceStatus(
     val last_seen: String? = null,
     val sims: List<DeviceSim> = emptyList(),
 )
+
+// --- campaigns (bulk send, api_key auth) ---
+
+data class Recipient(val to: String)
+
+data class CreateCampaignReq(
+    val text: String,
+    val recipients: List<Recipient>,
+    val from: String? = null,
+    // ISO-8601; null → send now
+    val send_at: String? = null,
+    val queued: Boolean = true,
+)
+
+/** POST `/api/v1/campaigns` 202 response. */
+data class CampaignCreated(val id: String, val status: String, val total: Int)
+
+/** Always carries all seven keys (server remaps internal "dispatched" → "sending"). */
+data class CampaignProgress(
+    val queued: Int = 0,
+    val sending: Int = 0,
+    val sent: Int = 0,
+    val delivered: Int = 0,
+    val failed: Int = 0,
+    val expired: Int = 0,
+    val canceled: Int = 0,
+)
+
+/**
+ * GET `/api/v1/campaigns/{id}` returns all fields; the pause/resume/cancel action endpoint returns
+ * only `{id, status}`, so `total`/`progress` default here to keep Moshi parsing both.
+ */
+data class CampaignDetail(
+    val id: String,
+    val status: String,
+    val total: Int = 0,
+    val progress: CampaignProgress = CampaignProgress(),
+)
+
+/**
+ * 422 body from create when any recipient is invalid — the whole batch is rejected (fail-fast atomic).
+ * `index` is the position in the submitted `recipients` array, mapped back to the source line by the UI.
+ */
+data class CampaignErrorBody(val error: CampaignError? = null)
+data class CampaignError(val code: String, val message: String = "", val bad_rows: List<BadRow> = emptyList())
+data class BadRow(val index: Int, val error: String, val to: String? = null, val missing: List<String>? = null)
+
+// --- account management (api_key auth) ---
+
+/** GET/POST `/api/v1/keys` item. On create, [api_key] carries the one-time raw `osk_...` token. */
+data class ApiKeyInfo(
+    val id: Long,
+    val prefix: String,
+    val name: String = "",
+    val scopes: List<String> = emptyList(),
+    val device_id: Long? = null,
+    val ip_allowlist: List<String> = emptyList(),
+    val is_test: Boolean = false,
+    val revoked: Boolean = false,
+    val created_at: String? = null,
+    val last_used_at: String? = null,
+    // present only in the 201 create response
+    val api_key: String? = null,
+)
+data class KeysList(val data: List<ApiKeyInfo> = emptyList())
+data class CreateKeyReq(
+    val name: String = "",
+    val scopes: List<String> = listOf("send", "read"),
+    val ip_allowlist: List<String> = emptyList(),
+)
+
+/** GET/PUT `/api/v1/webhook`. `secret` is read-only (server-generated); PUT ignores it. */
+data class WebhookConfig(
+    val url: String = "",
+    val events: List<String> = emptyList(),
+    val enabled: Boolean = false,
+    val secret: String = "",
+)
+data class WebhookPut(val url: String, val events: List<String>, val enabled: Boolean)
+
+data class DeviceInfo(
+    val id: Long,
+    val name: String = "",
+    val status: String = "",
+    val online: Boolean = false,
+    val last_seen: String? = null,
+    val app_version: String = "",
+    val sims: List<DeviceSim> = emptyList(),
+)
+data class DevicesList(val data: List<DeviceInfo> = emptyList())
+
+data class AuditEntry(
+    val actor: String = "",
+    val action: String = "",
+    val target: String = "",
+    val ip: String = "",
+    val at: String = "",
+)
+data class AuditList(val data: List<AuditEntry> = emptyList())

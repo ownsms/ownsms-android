@@ -8,6 +8,8 @@
     <string name="tab_sims_title">SIM kartalar</string>
     <string name="tab_settings_label">Sozlama</string>
     <string name="tab_settings_title">Sozlamalar</string>
+    <string name="tab_bulk_label">Rassilka</string>
+    <string name="tab_bulk_title">Rassilka</string>
 
     <!-- Onboarding (OnboardingScreen.kt) -->
     <string name="onboarding_subtitle">Telefoningizni ulang va o\'z SIM\'ingiz orqali API bilan SMS yuboring.</string>
@@ -83,6 +85,7 @@
 
     <!-- Actions / feedback (CopyableField, AppRoot, UiUtil) -->
     <string name="action_menu">Menyu</string>
+    <string name="action_back">Orqaga</string>
     <string name="action_copy">Nusxa olish</string>
     <string name="action_reveal">Ko\'rsatish</string>
     <string name="action_hide">Yashirish</string>
@@ -116,4 +119,92 @@
     <string name="guide_step5_title">SMS yuboring</string>
     <string name="guide_step5_body">API kalit bilan quyidagi so\'rovni yuboring — telefon SMS\'ni o\'z SIM\'idan jo\'natadi.</string>
     <string name="guide_curl_label">cURL misoli (nusxa olib ishlating):</string>
+
+    <!-- Send-rate overrides + account management (SettingsScreen.kt, AccountSettings.kt) -->
+    <string name="settings_rate_title">Yuborish tezligi</string>
+    <string name="settings_rate_hint">Bo\'sh = serverdagi qiymat ishlatiladi.</string>
+    <string name="settings_rate_pause">Tanaffus (soniya, kamida 2)</string>
+    <string name="settings_rate_min">Daqiqada</string>
+    <string name="settings_rate_hour">Soatda</string>
+    <string name="settings_rate_day">Kunda</string>
+    <string name="settings_rate_quota">Kunlik kvota</string>
+    <string name="settings_save">Saqlash</string>
+    <string name="settings_load">Yuklash</string>
+    <string name="settings_saved">Saqlandi</string>
+
+    <string name="settings_keys_title">API kalitlari</string>
+    <string name="settings_keys_new">Yangi kalit yaratish</string>
+    <string name="settings_keys_name">Nom (ixtiyoriy)</string>
+    <string name="settings_keys_ip">IP allowlist (vergul bilan, ixtiyoriy)</string>
+    <string name="settings_keys_ip_note">IP allowlist keyin o\'zgarmaydi — o\'zgartirish uchun yangi kalit yasab, eskisini bekor qiling.</string>
+    <string name="settings_keys_create">Yaratish</string>
+    <string name="settings_keys_revoke">Bekor qilish</string>
+    <string name="settings_keys_revoked">bekor qilingan</string>
+    <string name="settings_keys_new_notice">Yangi kalit — faqat hozir ko\'rinadi, nusxa oling:</string>
+
+    <string name="settings_webhook_title">Webhook</string>
+    <string name="settings_webhook_url">URL</string>
+    <string name="settings_webhook_enabled">Yoqilgan</string>
+    <string name="settings_webhook_secret">Imzo kaliti (secret)</string>
+    <string name="settings_webhook_event_sent">Yuborildi (sent)</string>
+    <string name="settings_webhook_event_delivered">Yetkazildi (delivered)</string>
+    <string name="settings_webhook_event_failed">Xato (failed)</string>
+
+    <string name="settings_devices_title">Qurilmalar</string>
+    <string name="settings_device_activate">Faollashtirish</string>
+    <string name="settings_device_deactivate">O\'chirish</string>
+    <string name="settings_device_online">onlayn</string>
+    <string name="settings_device_offline">oflayn</string>
+
+    <string name="settings_audit_title">Audit jurnali</string>
+    <string name="settings_audit_empty">Yozuv yo\'q</string>
+
+    <!-- ViewModel feedback messages (MainViewModel.kt) -->
+    <string name="msg_register_ok">Ro\'yxatdan o\'tdingiz — API KEY saqlandi.</string>
+    <string name="msg_register_err">Ro\'yxat xatosi: %1$s</string>
+    <string name="msg_pair_ok">Pairing muvaffaqiyatli — API KEY saqlandi.</string>
+    <string name="msg_pair_err">Pairing xatosi: %1$s</string>
+    <string name="msg_pairing_code">Pairing kod: %1$s (10 daqiqa)</string>
+    <string name="msg_pairing_code_err">Kod xatosi: %1$s</string>
+    <string name="msg_need_number">Raqam kiriting</string>
+    <string name="msg_test_ok">Test yuborildi: %1$s (%2$s)</string>
+    <string name="msg_test_err">Test xatosi: %1$s</string>
+    <string name="msg_server_unreachable">Server bilan bog\'lanib bo\'lmadi</string>
+    <string name="msg_start_blocked">Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang.</string>
+
+    <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->
+    <string name="onboarding_email_label">Email (ixtiyoriy)</string>
+    <string name="onboarding_sims_title">SIM raqamlari</string>
+    <string name="onboarding_sims_hint">Operator raqamni bermagan bo\'lishi mumkin — qo\'lda kiriting. Rassilkada «qaysi raqamdan» shu asosda ishlaydi.</string>
+    <string name="onboarding_sim_number_hint">Raqam (masalan +998901234567)</string>
+    <string name="onboarding_sim_default">Standart</string>
+    <string name="onboarding_perms_first">Avval ruxsatlarni bering — SIM\'lar shundan keyin ko\'rinadi.</string>
+
+    <!-- Bulk / campaigns (BulkScreen.kt) -->
+    <string name="bulk_compose_title">Yangi rassilka</string>
+    <string name="bulk_numbers_label">Raqamlar (har qatorda bittadan)</string>
+    <string name="bulk_numbers_hint">901234567\n935556677\n…</string>
+    <string name="bulk_count">%1$d ta raqam</string>
+    <string name="bulk_text_label">Barchaga yuboriladigan matn</string>
+    <string name="bulk_options_title">Sozlamalar</string>
+    <string name="bulk_queued_label">Navbatga qo\'yish (telefon oflayn bo\'lsa kutadi)</string>
+    <string name="bulk_from_label">Qaysi raqamdan</string>
+    <string name="bulk_from_default">Standart SIM</string>
+    <string name="bulk_schedule_btn">Vaqtni rejalashtirish</string>
+    <string name="bulk_schedule_clear">Bekor</string>
+    <string name="bulk_send_btn">Yuborish</string>
+    <string name="bulk_no_recipients">Kamida bitta raqam kiriting</string>
+    <string name="bulk_bad_rows_title">Xatolar — hech biri yuborilmadi</string>
+    <string name="bulk_has_bad_rows">Ba\'zi raqamlar noto\'g\'ri. Tuzatib qayta yuboring — hech biri yuborilmadi.</string>
+    <string name="bulk_bad_row">%1$d-qator: %2$s — %3$s</string>
+    <string name="bulk_reason_invalid_phone">raqam noto\'g\'ri</string>
+    <string name="bulk_reason_missing_to">raqam yo\'q</string>
+    <string name="bulk_reason_other">xato</string>
+    <string name="bulk_progress_title">Joriy rassilka</string>
+    <string name="bulk_progress_status">Holat: %1$s</string>
+    <string name="bulk_pause">Pauza</string>
+    <string name="bulk_resume">Davom</string>
+    <string name="bulk_cancel">Bekor qilish</string>
+    <string name="bulk_history_title">Oxirgi rassilkalar</string>
+    <string name="bulk_history_total">%1$d ta</string>
 </resources>

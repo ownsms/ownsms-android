@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -37,7 +38,11 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
     val message by vm.message.collectAsState()
     val loading by vm.loading.collectAsState()
     val permsGranted by vm.permsGranted.collectAsState()
+    val sims by vm.sims.collectAsState()
+    val simNumbers by vm.simNumbers.collectAsState()
+    val defaultSubId by vm.defaultSubId.collectAsState()
     var url by remember { mutableStateOf(vm.baseUrl.value) }
+    var email by remember { mutableStateOf("") }
     var pairCode by remember { mutableStateOf("") }
 
     Column(
@@ -64,6 +69,14 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
         )
 
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text(stringResource(R.string.onboarding_email_label)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+
         // Grant permissions before registering — that's when the device's SIMs are sent to the server.
         FilledTonalButton(
             onClick = onRequestPermissions,
@@ -73,8 +86,10 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
             Text(stringResource(if (permsGranted) R.string.onboarding_perms_ok else R.string.onboarding_request_perms_btn))
         }
 
+        SimNumberStep(sims, simNumbers, defaultSubId, permsGranted, vm)
+
         Button(
-            onClick = { vm.register(url) },
+            onClick = { vm.register(url, email) },
             enabled = url.isNotBlank() && permsGranted && !loading,
             shape = RoundedCornerShape(14.dp),
             modifier = Modifier
@@ -119,6 +134,52 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
 
         message?.let {
             Text(it, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}
+
+/** After permissions are granted, show each detected SIM with an editable number + a default picker. */
+@Composable
+private fun SimNumberStep(
+    sims: List<uz.ownsms.sender.sms.SimInfo>,
+    simNumbers: Map<Int, String>,
+    defaultSubId: Int,
+    permsGranted: Boolean,
+    vm: MainViewModel,
+) {
+    if (!permsGranted) {
+        Text(
+            stringResource(R.string.onboarding_perms_first),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        return
+    }
+    if (sims.isEmpty()) return
+
+    Text(stringResource(R.string.onboarding_sims_title), style = MaterialTheme.typography.titleMedium)
+    Text(
+        stringResource(R.string.onboarding_sims_hint),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    sims.forEach { sim ->
+        OutlinedTextField(
+            value = simNumbers[sim.subscriptionId].orEmpty(),
+            onValueChange = { vm.setSimNumber(sim.subscriptionId, it) },
+            label = { Text(sim.displayName) },
+            placeholder = { Text(stringResource(R.string.onboarding_sim_number_hint)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (sims.size > 1) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                RadioButton(
+                    selected = sim.subscriptionId == defaultSubId,
+                    onClick = { vm.setDefaultSub(sim.subscriptionId) },
+                )
+                Text(stringResource(R.string.onboarding_sim_default), style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }
