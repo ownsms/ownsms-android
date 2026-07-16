@@ -26,6 +26,9 @@
 # KEEP ALL DTOs used by reflection (Moshi reads/writes these via reflection, not codegen)
 -keep class uz.ownsms.sender.data.remote.** { *; }
 -keepclassmembers class uz.ownsms.sender.data.remote.** { *; }
+# CampaignSummary is Moshi-reflected for the local campaign-history JSON in prefs.
+-keep class uz.ownsms.sender.data.prefs.CampaignSummary { *; }
+-keepclassmembers class uz.ownsms.sender.data.prefs.CampaignSummary { *; }
 
 # Room
 -keep class * extends androidx.room.RoomDatabase { <init>(); }
