@@ -12,6 +12,7 @@ data class SimInfo(
     val slotIndex: Int,
     val displayName: String,
     val number: String,
+    val operator: String = "",
 )
 
 class SimRepository(private val context: Context) {
@@ -53,6 +54,7 @@ class SimRepository(private val context: Context) {
                 slotIndex = info.simSlotIndex,
                 displayName = info.displayName?.toString() ?: "SIM ${info.simSlotIndex + 1}",
                 number = number ?: "",
+                operator = info.carrierName?.toString().orEmpty(),
             )
         }
     }

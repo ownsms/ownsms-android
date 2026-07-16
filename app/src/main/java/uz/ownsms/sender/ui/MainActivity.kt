@@ -17,6 +17,8 @@ import uz.ownsms.sender.ui.theme.OwnSmsTheme
 class MainActivity : ComponentActivity() {
 
     private val vm: MainViewModel by viewModels()
+    private val bulkVm: BulkViewModel by viewModels()
+    private val accountVm: AccountViewModel by viewModels()
 
     private val permLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
@@ -32,6 +34,8 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colorScheme.background) {
                     AppRoot(
                         vm = vm,
+                        bulkVm = bulkVm,
+                        accountVm = accountVm,
                         onRequestPermissions = ::requestPerms,
                         onIgnoreBattery = ::requestIgnoreBattery,
                     )

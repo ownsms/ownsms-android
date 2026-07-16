@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import uz.ownsms.sender.BuildConfig
+import uz.ownsms.sender.R
 import uz.ownsms.sender.ServiceLocator
 import uz.ownsms.sender.data.db.JobEntity
 import uz.ownsms.sender.data.remote.ApiClient
@@ -34,11 +36,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val dao = ServiceLocator.db.jobDao()
     private val reliabilityChecker = ReliabilityChecker(app)
 
+    private val app get() = getApplication<Application>()
+
     val baseUrl = MutableStateFlow(settings.baseUrl)
     val token = MutableStateFlow(settings.deviceToken)
     val enabled = MutableStateFlow(settings.enabled)
     val sims = MutableStateFlow<List<SimInfo>>(emptyList())
     val defaultSubId = MutableStateFlow(settings.defaultSubId)
+
+    /** User-editable phone numbers per SIM (carriers often leave the SIM number blank in UZ). */
+    val simNumbers = MutableStateFlow<Map<Int, String>>(emptyMap())
     val reliability = MutableStateFlow<List<Check>>(emptyList())
     val ready = MutableStateFlow(false)
 
@@ -77,7 +84,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 hasMoreServer.value = page.next_before != null
                 serverLoadedOnce = true
             } catch (e: Exception) {
-                serverError.value = e.message ?: "Server bilan bog'lanib bo'lmadi"
+                serverError.value = e.message ?: app.getString(R.string.msg_server_unreachable)
             } finally {
                 loading.value = false
             }
@@ -101,7 +108,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 nextBefore = page.next_before
                 hasMoreServer.value = page.next_before != null
             } catch (e: Exception) {
-                serverError.value = e.message ?: "Server bilan bog'lanib bo'lmadi"
+                serverError.value = e.message ?: app.getString(R.string.msg_server_unreachable)
             } finally {
                 loading.value = false
             }
@@ -111,11 +118,19 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun refreshSims() {
         val list = simRepo.list()
         sims.value = list
+        // Seed editable numbers from the detected value, but never clobber a number the user typed.
+        simNumbers.value = list.associate { sim ->
+            sim.subscriptionId to (simNumbers.value[sim.subscriptionId] ?: sim.number)
+        }
         // Auto-select a valid SIM so single-SIM phones aren't blocked; the user can still change it.
         if (list.isNotEmpty() && list.none { it.subscriptionId == defaultSubId.value }) {
             setDefaultSub(list.first().subscriptionId)
         }
         recomputeCanStart()
+    }
+
+    fun setSimNumber(subId: Int, number: String) {
+        simNumbers.value = simNumbers.value + (subId to number)
     }
 
     fun refreshReliability() {
@@ -135,16 +150,16 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         OemAutostart.open(getApplication())
     }
 
-    fun register(url: String) {
+    fun register(url: String, email: String) {
         viewModelScope.launch {
             loading.value = true
             try {
                 val res = ApiClient.create(url, "")
-                    .signup(SignupRequest(device_name = Build.MODEL, app_version = "0.1.0", sims = simRegs()))
+                    .signup(SignupRequest(email = email.trim(), device_name = Build.MODEL, app_version = APP_VERSION, sims = simRegs()))
                 applyProvisioned(url, res)
-                message.value = "Ro'yxatdan o'tdingiz — API KEY saqlandi."
+                message.value = app.getString(R.string.msg_register_ok)
             } catch (e: Exception) {
-                message.value = "Ro'yxat xatosi: ${e.message ?: "tarmoq"}"
+                message.value = app.getString(R.string.msg_register_err, e.message ?: "")
             } finally {
                 loading.value = false
             }
@@ -156,11 +171,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             loading.value = true
             try {
                 val res = ApiClient.create(url, "")
-                    .pair(PairRequest(code = code.trim(), device_name = Build.MODEL, app_version = "0.1.0", sims = simRegs()))
+                    .pair(PairRequest(code = code.trim(), device_name = Build.MODEL, app_version = APP_VERSION, sims = simRegs()))
                 applyProvisioned(url, res)
-                message.value = "Pairing muvaffaqiyatli — API KEY saqlandi."
+                message.value = app.getString(R.string.msg_pair_ok)
             } catch (e: Exception) {
-                message.value = "Pairing xatosi: ${e.message ?: "kod noto'g'ri"}"
+                message.value = app.getString(R.string.msg_pair_err, e.message ?: "")
             } finally {
                 loading.value = false
             }
@@ -172,9 +187,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             loading.value = true
             try {
                 val res = ServiceLocator.api().pairingCode()
-                message.value = "Pairing kod: ${res.code} (10 daqiqa)"
+                message.value = app.getString(R.string.msg_pairing_code, res.code)
             } catch (e: Exception) {
-                message.value = "Kod xatosi: ${e.message ?: "tarmoq"}"
+                message.value = app.getString(R.string.msg_pairing_code_err, e.message ?: "")
             } finally {
                 loading.value = false
             }
@@ -183,24 +198,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun sendTest(to: String, text: String) {
         if (to.isBlank()) {
-            message.value = "Raqam kiriting"
+            message.value = app.getString(R.string.msg_need_number)
             return
         }
         viewModelScope.launch {
             loading.value = true
             try {
                 val res = ServiceLocator.devApi().sendMessage(SendMessageReq(to = to, text = text.ifBlank { "ownsms test" }))
-                message.value = "Test yuborildi: ${res.id} (${res.status})"
+                message.value = app.getString(R.string.msg_test_ok, res.id, res.status)
             } catch (e: Exception) {
-                message.value = "Test xatosi: ${e.message ?: "tarmoq"}"
+                message.value = app.getString(R.string.msg_test_err, e.message ?: "")
             } finally {
                 loading.value = false
             }
         }
     }
 
-    private fun simRegs(): List<SimReg> = simRepo.list().map {
-        SimReg(it.subscriptionId, it.number, "", it.subscriptionId == defaultSubId.value)
+    private fun simRegs(): List<SimReg> = sims.value.map {
+        SimReg(
+            subscription_id = it.subscriptionId,
+            number = (simNumbers.value[it.subscriptionId] ?: it.number).trim(),
+            operator = it.operator,
+            is_default = it.subscriptionId == defaultSubId.value,
+        )
+    }.also { regs ->
+        // Remember the numbers so the bulk "from" picker can offer them (carrier numbers are often blank).
+        settings.registeredNumbers = regs.map { it.number }.filter { it.isNotBlank() }
     }
 
     private fun applyProvisioned(url: String, res: Provisioned) {
@@ -224,10 +247,31 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         baseUrl.value = settings.baseUrl
     }
 
+    // --- send-rate overrides (persisted; SenderService reads them via Settings) ---
+    val pauseSeconds = MutableStateFlow(settings.pauseSeconds)
+    val ratePerMin = MutableStateFlow(settings.ratePerMin)
+    val ratePerHour = MutableStateFlow(settings.ratePerHour)
+    val ratePerDay = MutableStateFlow(settings.ratePerDay)
+    val dailyQuota = MutableStateFlow(settings.dailyQuota)
+
+    fun saveOverrides(pause: Int?, min: Int?, hour: Int?, day: Int?, quota: Int?) {
+        settings.pauseSeconds = pause
+        settings.ratePerMin = min
+        settings.ratePerHour = hour
+        settings.ratePerDay = day
+        settings.dailyQuota = quota
+        // Re-read: pauseSeconds may have been floored to PAUSE_FLOOR_SEC on write.
+        pauseSeconds.value = settings.pauseSeconds
+        ratePerMin.value = settings.ratePerMin
+        ratePerHour.value = settings.ratePerHour
+        ratePerDay.value = settings.ratePerDay
+        dailyQuota.value = settings.dailyQuota
+    }
+
     fun start() {
         recomputeCanStart()
         if (!canStart.value) {
-            message.value = "Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang."
+            message.value = app.getString(R.string.msg_start_blocked)
             return
         }
         settings.enabled = true
@@ -241,5 +285,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         enabled.value = false
         SenderService.stop(getApplication())
         WatchdogWorker.cancel(getApplication())
+    }
+
+    private companion object {
+        val APP_VERSION: String = BuildConfig.VERSION_NAME
     }
 }

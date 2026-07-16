@@ -8,6 +8,8 @@
     <string name="tab_sims_title">SIM-карты</string>
     <string name="tab_settings_label">Настройки</string>
     <string name="tab_settings_title">Настройки</string>
+    <string name="tab_bulk_label">Рассылка</string>
+    <string name="tab_bulk_title">Рассылка</string>
 
     <!-- Onboarding (OnboardingScreen.kt) -->
     <string name="onboarding_subtitle">Подключите телефон и отправляйте SMS через API с помощью своей SIM-карты.</string>
@@ -83,6 +85,7 @@
 
     <!-- Actions / feedback (CopyableField, AppRoot, UiUtil) -->
     <string name="action_menu">Меню</string>
+    <string name="action_back">Назад</string>
     <string name="action_copy">Копировать</string>
     <string name="action_reveal">Показать</string>
     <string name="action_hide">Скрыть</string>
@@ -116,4 +119,92 @@
     <string name="guide_step5_title">Отправьте SMS</string>
     <string name="guide_step5_body">Отправьте запрос ниже с API-ключом — телефон отправит SMS со своей SIM-карты.</string>
     <string name="guide_curl_label">Пример cURL (скопируйте и используйте):</string>
+
+    <!-- Send-rate overrides + account management (SettingsScreen.kt, AccountSettings.kt) -->
+    <string name="settings_rate_title">Скорость отправки</string>
+    <string name="settings_rate_hint">Пусто = используется значение с сервера.</string>
+    <string name="settings_rate_pause">Пауза (сек, минимум 2)</string>
+    <string name="settings_rate_min">В минуту</string>
+    <string name="settings_rate_hour">В час</string>
+    <string name="settings_rate_day">В день</string>
+    <string name="settings_rate_quota">Дневная квота</string>
+    <string name="settings_save">Сохранить</string>
+    <string name="settings_load">Загрузить</string>
+    <string name="settings_saved">Сохранено</string>
+
+    <string name="settings_keys_title">API-ключи</string>
+    <string name="settings_keys_new">Создать новый ключ</string>
+    <string name="settings_keys_name">Название (необязательно)</string>
+    <string name="settings_keys_ip">IP allowlist (через запятую, необязательно)</string>
+    <string name="settings_keys_ip_note">IP allowlist потом не меняется — создайте новый ключ и отзовите старый.</string>
+    <string name="settings_keys_create">Создать</string>
+    <string name="settings_keys_revoke">Отозвать</string>
+    <string name="settings_keys_revoked">отозван</string>
+    <string name="settings_keys_new_notice">Новый ключ — показывается только сейчас, скопируйте:</string>
+
+    <string name="settings_webhook_title">Webhook</string>
+    <string name="settings_webhook_url">URL</string>
+    <string name="settings_webhook_enabled">Включён</string>
+    <string name="settings_webhook_secret">Ключ подписи (secret)</string>
+    <string name="settings_webhook_event_sent">Отправлено (sent)</string>
+    <string name="settings_webhook_event_delivered">Доставлено (delivered)</string>
+    <string name="settings_webhook_event_failed">Ошибка (failed)</string>
+
+    <string name="settings_devices_title">Устройства</string>
+    <string name="settings_device_activate">Активировать</string>
+    <string name="settings_device_deactivate">Отключить</string>
+    <string name="settings_device_online">онлайн</string>
+    <string name="settings_device_offline">офлайн</string>
+
+    <string name="settings_audit_title">Журнал аудита</string>
+    <string name="settings_audit_empty">Записей нет</string>
+
+    <!-- ViewModel feedback messages (MainViewModel.kt) -->
+    <string name="msg_register_ok">Регистрация выполнена — API-ключ сохранён.</string>
+    <string name="msg_register_err">Ошибка регистрации: %1$s</string>
+    <string name="msg_pair_ok">Сопряжение выполнено — API-ключ сохранён.</string>
+    <string name="msg_pair_err">Ошибка сопряжения: %1$s</string>
+    <string name="msg_pairing_code">Код сопряжения: %1$s (10 минут)</string>
+    <string name="msg_pairing_code_err">Ошибка кода: %1$s</string>
+    <string name="msg_need_number">Введите номер</string>
+    <string name="msg_test_ok">Тест отправлен: %1$s (%2$s)</string>
+    <string name="msg_test_err">Ошибка теста: %1$s</string>
+    <string name="msg_server_unreachable">Не удалось связаться с сервером</string>
+    <string name="msg_start_blocked">Перед запуском предоставьте все разрешения и выберите SIM.</string>
+
+    <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->
+    <string name="onboarding_email_label">Email (необязательно)</string>
+    <string name="onboarding_sims_title">Номера SIM</string>
+    <string name="onboarding_sims_hint">Оператор мог не записать номер — введите вручную. От него зависит выбор «с какого номера» в рассылке.</string>
+    <string name="onboarding_sim_number_hint">Номер (например +998901234567)</string>
+    <string name="onboarding_sim_default">По умолчанию</string>
+    <string name="onboarding_perms_first">Сначала дайте разрешения — SIM появятся после этого.</string>
+
+    <!-- Bulk / campaigns (BulkScreen.kt) -->
+    <string name="bulk_compose_title">Новая рассылка</string>
+    <string name="bulk_numbers_label">Номера (по одному в строке)</string>
+    <string name="bulk_numbers_hint">901234567\n935556677\n…</string>
+    <string name="bulk_count">Номеров: %1$d</string>
+    <string name="bulk_text_label">Текст для всех</string>
+    <string name="bulk_options_title">Параметры</string>
+    <string name="bulk_queued_label">В очередь (ждать, если телефон офлайн)</string>
+    <string name="bulk_from_label">С какого номера</string>
+    <string name="bulk_from_default">SIM по умолчанию</string>
+    <string name="bulk_schedule_btn">Запланировать время</string>
+    <string name="bulk_schedule_clear">Сбросить</string>
+    <string name="bulk_send_btn">Отправить</string>
+    <string name="bulk_no_recipients">Введите хотя бы один номер</string>
+    <string name="bulk_bad_rows_title">Ошибки — ничего не отправлено</string>
+    <string name="bulk_has_bad_rows">Некоторые номера неверны. Исправьте и отправьте снова — ничего не отправлено.</string>
+    <string name="bulk_bad_row">Строка %1$d: %2$s — %3$s</string>
+    <string name="bulk_reason_invalid_phone">неверный номер</string>
+    <string name="bulk_reason_missing_to">нет номера</string>
+    <string name="bulk_reason_other">ошибка</string>
+    <string name="bulk_progress_title">Текущая рассылка</string>
+    <string name="bulk_progress_status">Статус: %1$s</string>
+    <string name="bulk_pause">Пауза</string>
+    <string name="bulk_resume">Продолжить</string>
+    <string name="bulk_cancel">Отменить</string>
+    <string name="bulk_history_title">Последние рассылки</string>
+    <string name="bulk_history_total">%1$d шт.</string>
 </resources>

@@ -107,7 +107,9 @@ class SenderService : Service() {
         val now = System.currentTimeMillis()
         if (config != null && now - lastConfigAt < 5 * 60_000L) return
         try {
-            config = ServiceLocator.api().config()
+            val s = ServiceLocator.settings
+            val overrides = Overrides(s.pauseSeconds, s.ratePerMin, s.ratePerHour, s.ratePerDay, s.dailyQuota)
+            config = ServiceLocator.api().config().withOverrides(overrides)
             lastConfigAt = now
         } catch (e: Exception) {
             // keep previous config; without any config we fall back to default pacing
