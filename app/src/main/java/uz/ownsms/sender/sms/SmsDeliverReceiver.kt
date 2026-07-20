@@ -32,6 +32,11 @@ class SmsDeliverReceiver : BroadcastReceiver() {
             put(Telephony.Sms.READ, 0)
             put(Telephony.Sms.SEEN, 0)
             put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_INBOX)
+            // Group under the sender's conversation so the messaging app shows it in the right thread.
+            if (sender != null) {
+                runCatching { Telephony.Threads.getOrCreateThreadId(context, sender) }.getOrNull()
+                    ?.let { put(Telephony.Sms.THREAD_ID, it) }
+            }
         }
         try {
             context.contentResolver.insert(Telephony.Sms.Inbox.CONTENT_URI, values)

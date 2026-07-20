@@ -46,6 +46,9 @@ class SmsSender(private val context: Context) {
             put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_SENT)
             put(Telephony.Sms.READ, 1)
             put(Telephony.Sms.SEEN, 1)
+            // Group under the recipient's conversation so it shows correctly in the messaging app.
+            runCatching { Telephony.Threads.getOrCreateThreadId(context, to) }.getOrNull()
+                ?.let { put(Telephony.Sms.THREAD_ID, it) }
         }
         try {
             context.contentResolver.insert(Telephony.Sms.Sent.CONTENT_URI, values)
