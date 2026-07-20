@@ -32,23 +32,47 @@ class SenderService : Service() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var loop: Job? = null
+    private var reporter: Job? = null
     private lateinit var dao: JobDao
     private lateinit var sender: SmsSender
     private val rateGate = RateGate()
     private var config: DeviceConfig? = null
     private var lastConfigAt = 0L
 
+    @Volatile private var paused = false
+
     override fun onCreate() {
         super.onCreate()
         Notifications.ensureChannel(this)
-        startForeground(Notifications.FOREGROUND_ID, Notifications.build(this, "Ishga tushmoqda…"))
+        startForeground(Notifications.FOREGROUND_ID, Notifications.build(this, "Ishga tushmoqda…", paused))
         dao = ServiceLocator.db.jobDao()
         sender = SmsSender(applicationContext)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        when (intent?.action) {
+            ACTION_STOP -> {
+                ServiceLocator.settings.enabled = false
+                WatchdogWorker.cancel(applicationContext)
+                stopSelf()
+                return START_NOT_STICKY
+            }
+            ACTION_PAUSE -> {
+                paused = true
+                notify("Pauza — yuborish to'xtatildi")
+            }
+            ACTION_RESUME -> {
+                paused = false
+                notify("Davom etmoqda…")
+            }
+        }
         if (loop?.isActive != true) {
             loop = scope.launch { runLoop() }
+        }
+        // Report outcomes on a fast cadence, independent of the ~30s long-poll, so "sent"/"delivered"
+        // reach the server well inside its job lease (otherwise the server reclaims them as failed).
+        if (reporter?.isActive != true) {
+            reporter = scope.launch { reporterLoop() }
         }
         return START_STICKY
     }
@@ -69,8 +93,12 @@ class SenderService : Service() {
                     delay(10_000)
                     continue
                 }
+                if (paused) {
+                    notify("Pauza — yuborish to'xtatildi")
+                    delay(3_000)
+                    continue
+                }
                 refreshConfigIfStale()
-                reportOutcomes()
                 sendClaimed()
                 notify("Ulangan. Kutilmoqda…")
                 poll()
@@ -80,6 +108,20 @@ class SenderService : Service() {
                 notify("Tarmoq xatosi, qayta urinish…")
                 delay(5_000)
             }
+        }
+    }
+
+    /** Reports outcomes every ~5s, decoupled from the long-poll, so reports land within the server lease. */
+    private suspend fun reporterLoop() {
+        while (scope.isActive) {
+            try {
+                if (ServiceLocator.settings.isConfigured) reportOutcomes()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // transient; retry next tick
+            }
+            delay(5_000)
         }
     }
 
@@ -160,15 +202,19 @@ class SenderService : Service() {
                 } catch (e: Exception) { /* retry next iteration */ }
             }
         }
-        dao.prune(200) // keep local history bounded
+        dao.prune(200) // keep local history bounded — only fully-reported rows are eligible
     }
 
     private fun notify(text: String) {
         getSystemService(NotificationManager::class.java)
-            .notify(Notifications.FOREGROUND_ID, Notifications.build(this, text))
+            .notify(Notifications.FOREGROUND_ID, Notifications.build(this, text, paused))
     }
 
     companion object {
+        const val ACTION_STOP = "uz.ownsms.sender.action.STOP"
+        const val ACTION_PAUSE = "uz.ownsms.sender.action.PAUSE"
+        const val ACTION_RESUME = "uz.ownsms.sender.action.RESUME"
+
         fun start(context: Context) {
             ContextCompat.startForegroundService(context, Intent(context, SenderService::class.java))
         }

@@ -24,7 +24,9 @@ interface JobDao {
     @Query("UPDATE jobs SET reported = 1 WHERE id = :id")
     suspend fun markReported(id: Long)
 
-    @Query("DELETE FROM jobs WHERE id NOT IN (SELECT id FROM jobs ORDER BY id DESC LIMIT :keep)")
+    // Only fully-reported rows are prunable; unreported terminal/awaiting-delivery rows are kept
+    // so a delivered/sent report is never dropped before it reaches the server.
+    @Query("DELETE FROM jobs WHERE reported = 1 AND id NOT IN (SELECT id FROM jobs ORDER BY id DESC LIMIT :keep)")
     suspend fun prune(keep: Int)
 
     @Query("SELECT * FROM jobs ORDER BY id DESC LIMIT :limit")

@@ -89,7 +89,7 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
             } catch (e: HttpException) {
                 if (e.code() == 422) mapBadRows(e, parsed) else message.value = "Xato: HTTP ${e.code()}"
             } catch (e: Exception) {
-                message.value = e.message ?: "Tarmoq xatosi"
+                message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
             } finally {
                 loading.value = false
             }
@@ -114,7 +114,7 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
                     active.value = d
                     if (d.status in TERMINAL) break
                 } catch (e: Exception) {
-                    message.value = e.message ?: "Tarmoq xatosi"
+                    message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
                     break
                 }
                 delay(5_000L)
@@ -136,7 +136,7 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
                 ServiceLocator.devApi().campaignAction(id, act)
                 open(id)
             } catch (e: Exception) {
-                message.value = e.message ?: "Tarmoq xatosi"
+                message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
             } finally {
                 loading.value = false
             }
