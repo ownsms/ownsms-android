@@ -77,6 +77,7 @@ fun AppRoot(
     accountVm: AccountViewModel,
     onRequestPermissions: () -> Unit,
     onIgnoreBattery: () -> Unit,
+    onRequestDefaultSms: () -> Unit,
 ) {
     val savedToken by vm.token.collectAsState()
     if (savedToken.isBlank()) {
@@ -198,7 +199,7 @@ fun AppRoot(
                             composable(Tab.BULK.route) { BulkScreen(bulkVm) }
                             composable(Tab.SIMS.route) { SimsScreen(vm) }
                             composable(Tab.SETTINGS.route) {
-                                SettingsScreen(vm, accountVm, onRequestPermissions, onIgnoreBattery)
+                                SettingsScreen(vm, accountVm, onRequestPermissions, onIgnoreBattery, onRequestDefaultSms)
                             }
                             composable(ROUTE_ABOUT) { AboutScreen() }
                             composable(ROUTE_GUIDE) { GuideScreen(vm) }

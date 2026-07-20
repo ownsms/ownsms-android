@@ -27,6 +27,12 @@ class MainActivity : ComponentActivity() {
         vm.refreshReliability()
     }
 
+    private val defaultSmsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) {
+        vm.refreshReliability() // re-reads isDefaultSms
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -38,6 +44,7 @@ class MainActivity : ComponentActivity() {
                         accountVm = accountVm,
                         onRequestPermissions = ::requestPerms,
                         onIgnoreBattery = ::requestIgnoreBattery,
+                        onRequestDefaultSms = ::requestDefaultSms,
                     )
                 }
             }
@@ -61,6 +68,16 @@ class MainActivity : ComponentActivity() {
             perms.add(Manifest.permission.POST_NOTIFICATIONS)
         }
         permLauncher.launch(perms.toTypedArray())
+    }
+
+    private fun requestDefaultSms() {
+        val intent = uz.ownsms.sender.sms.DefaultSmsApp.requestIntent(this) ?: return
+        try {
+            defaultSmsLauncher.launch(intent)
+        } catch (e: Exception) {
+            // Some OEMs route this through system settings instead — best-effort.
+            startActivity(intent)
+        }
     }
 
     private fun requestIgnoreBattery() {

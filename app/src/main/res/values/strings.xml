@@ -174,6 +174,12 @@
     <string name="err_no_api_key">API kalit yo\'q — qurilmani qayta ro\'yxatdan o\'tkazing.</string>
     <string name="msg_reregister_prompt">Kalitlar tozalandi — qayta ro\'yxatdan o\'ting.</string>
     <string name="settings_reregister_btn">Qurilmani qayta ro\'yxatdan o\'tkazish</string>
+
+    <string name="settings_defsms_title">Standart SMS ilovasi</string>
+    <string name="settings_defsms_on">Ilova standart SMS ilovasi — ommaviy yuborish to\'siqsiz</string>
+    <string name="settings_defsms_off">Standart emas — ko\'p SMS yuborilganda tizim bloklashi mumkin</string>
+    <string name="settings_defsms_hint">Standart SMS ilovasi qilinса, tizimning \"ko\'p SMS\" cheklovi olib tashlanadi. Kiruvchi SMS\'lar saqlanadi va boshqa messenger\'да ko\'rinaveradi.</string>
+    <string name="settings_defsms_btn">Standart SMS ilovasi qilish</string>
     <string name="msg_start_blocked">Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->

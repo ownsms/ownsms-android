@@ -57,8 +57,14 @@ class SenderService : Service() {
                 stopSelf()
                 return START_NOT_STICKY
             }
-            ACTION_PAUSE -> { paused = true; notify("Pauza — yuborish to'xtatildi") }
-            ACTION_RESUME -> { paused = false; notify("Davom etmoqda…") }
+            ACTION_PAUSE -> {
+                paused = true
+                notify("Pauza — yuborish to'xtatildi")
+            }
+            ACTION_RESUME -> {
+                paused = false
+                notify("Davom etmoqda…")
+            }
         }
         if (loop?.isActive != true) {
             loop = scope.launch { runLoop() }

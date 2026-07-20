@@ -1,8 +1,10 @@
 package uz.ownsms.sender.sms
 
 import android.app.PendingIntent
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.provider.Telephony
 import android.telephony.SmsManager
 
 /** Sends SMS through a chosen SIM via [SmsManager], wiring sent/delivered result PendingIntents. */
@@ -28,6 +30,28 @@ class SmsSender(private val context: Context) {
             deliveredIntents.add(resultPi(jobId, i, SmsResultReceiver.ACTION_DELIVERED))
         }
         sms.sendMultipartTextMessage(to, null, parts, sentIntents, deliveredIntents)
+        writeToSentBox(to, text)
+    }
+
+    /**
+     * When we're the default SMS app, mirror API-sent messages into the provider's Sent box so they
+     * show up in the user's normal messaging app. No-op / harmless failure when not default.
+     */
+    private fun writeToSentBox(to: String, text: String) {
+        if (context.packageName != Telephony.Sms.getDefaultSmsPackage(context)) return
+        val values = ContentValues().apply {
+            put(Telephony.Sms.ADDRESS, to)
+            put(Telephony.Sms.BODY, text)
+            put(Telephony.Sms.DATE, System.currentTimeMillis())
+            put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_SENT)
+            put(Telephony.Sms.READ, 1)
+            put(Telephony.Sms.SEEN, 1)
+        }
+        try {
+            context.contentResolver.insert(Telephony.Sms.Sent.CONTENT_URI, values)
+        } catch (e: Exception) {
+            // best-effort provider mirror
+        }
     }
 
     private fun resultPi(jobId: Long, part: Int, action: String): PendingIntent {

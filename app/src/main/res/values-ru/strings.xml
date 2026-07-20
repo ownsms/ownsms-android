@@ -174,6 +174,12 @@
     <string name="err_no_api_key">Нет API-ключа — перерегистрируйте устройство.</string>
     <string name="msg_reregister_prompt">Ключи очищены — зарегистрируйтесь заново.</string>
     <string name="settings_reregister_btn">Перерегистрировать устройство</string>
+
+    <string name="settings_defsms_title">SMS-приложение по умолчанию</string>
+    <string name="settings_defsms_on">Приложение по умолчанию — массовая отправка без блокировки</string>
+    <string name="settings_defsms_off">Не по умолчанию — система может заблокировать при массовой отправке</string>
+    <string name="settings_defsms_hint">Если сделать приложением SMS по умолчанию, системное ограничение «слишком много SMS» снимается. Входящие SMS сохраняются и видны в других мессенджерах.</string>
+    <string name="settings_defsms_btn">Сделать приложением SMS по умолчанию</string>
     <string name="msg_start_blocked">Перед запуском предоставьте все разрешения и выберите SIM.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->

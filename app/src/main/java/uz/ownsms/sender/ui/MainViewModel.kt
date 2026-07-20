@@ -55,6 +55,9 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     /** Mandatory runtime permissions granted — required before registering so SIMs are captured. */
     val permsGranted = MutableStateFlow(false)
     val oemAggressive: Boolean = OemAutostart.isLikelyAggressive()
+
+    /** Whether this app is the phone's default SMS app (exempts bulk sends from the OS rate limit). */
+    val isDefaultSms = MutableStateFlow(false)
     val apiKey = MutableStateFlow(settings.apiKey)
     val message = MutableStateFlow<String?>(null)
     val loading = MutableStateFlow(false)
@@ -139,6 +142,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         permsGranted.value = reliabilityChecker.permissionsGranted()
         // Re-read enabled so the Home toggle reflects a Stop done from the notification.
         enabled.value = settings.enabled
+        isDefaultSms.value = uz.ownsms.sender.sms.DefaultSmsApp.isDefault(app)
         recomputeCanStart()
     }
 

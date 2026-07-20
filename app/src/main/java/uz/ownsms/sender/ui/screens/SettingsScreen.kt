@@ -35,8 +35,15 @@ import uz.ownsms.sender.ui.theme.StatusDelivered
 import uz.ownsms.sender.ui.theme.StatusFailed
 
 @Composable
-fun SettingsScreen(vm: MainViewModel, accountVm: AccountViewModel, onRequestPermissions: () -> Unit, onIgnoreBattery: () -> Unit) {
+fun SettingsScreen(
+    vm: MainViewModel,
+    accountVm: AccountViewModel,
+    onRequestPermissions: () -> Unit,
+    onIgnoreBattery: () -> Unit,
+    onRequestDefaultSms: () -> Unit,
+) {
     val reliability by vm.reliability.collectAsState()
+    val isDefaultSms by vm.isDefaultSms.collectAsState()
     val apiKey by vm.apiKey.collectAsState()
     val message by vm.message.collectAsState()
     val savedToken by vm.token.collectAsState()
@@ -75,6 +82,33 @@ fun SettingsScreen(vm: MainViewModel, accountVm: AccountViewModel, onRequestPerm
             if (vm.oemAggressive) {
                 FilledTonalButton(onClick = { vm.openOemAutostart() }, modifier = Modifier.fillMaxWidth()) {
                     Text(stringResource(R.string.settings_oem_autostart_btn))
+                }
+            }
+        }
+
+        SectionCard(stringResource(R.string.settings_defsms_title)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    if (isDefaultSms) "✓" else "✗",
+                    color = if (isDefaultSms) StatusDelivered else StatusFailed,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Text(
+                    stringResource(if (isDefaultSms) R.string.settings_defsms_on else R.string.settings_defsms_off),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+            Text(
+                stringResource(R.string.settings_defsms_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            if (!isDefaultSms) {
+                FilledTonalButton(onClick = onRequestDefaultSms, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.settings_defsms_btn))
                 }
             }
         }
