@@ -11,7 +11,9 @@ import uz.ownsms.sender.R
 
 object Notifications {
     const val CHANNEL_ID = "ownsms_sender"
+    const val INCOMING_CHANNEL_ID = "ownsms_incoming"
     const val FOREGROUND_ID = 1
+    private var incomingId = 1000
 
     fun ensureChannel(context: Context) {
         val mgr = context.getSystemService(NotificationManager::class.java)
@@ -23,6 +25,28 @@ object Notifications {
             ).apply { description = "SMS yuborish xizmati holati" }
             mgr.createNotificationChannel(channel)
         }
+        if (mgr.getNotificationChannel(INCOMING_CHANNEL_ID) == null) {
+            val channel = NotificationChannel(
+                INCOMING_CHANNEL_ID,
+                "Kiruvchi SMS",
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply { description = "Kiruvchi SMS bildirishnomalari" }
+            mgr.createNotificationChannel(channel)
+        }
+    }
+
+    /** Posts a heads-up notification for an incoming SMS — the default SMS app is responsible for it. */
+    fun notifyIncoming(context: Context, sender: String?, body: String) {
+        ensureChannel(context)
+        val n = NotificationCompat.Builder(context, INCOMING_CHANNEL_ID)
+            .setContentTitle(sender ?: "SMS")
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setAutoCancel(true)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+            .build()
+        context.getSystemService(NotificationManager::class.java).notify(incomingId++, n)
     }
 
     private fun action(context: Context, act: String): PendingIntent {
@@ -37,12 +61,13 @@ object Notifications {
             .setSmallIcon(R.drawable.ic_launcher)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
+        val icon = R.drawable.ic_launcher
         if (paused) {
-            builder.addAction(0, "Davom etish", action(context, SenderService.ACTION_RESUME))
+            builder.addAction(icon, "Davom etish", action(context, SenderService.ACTION_RESUME))
         } else {
-            builder.addAction(0, "Pauza", action(context, SenderService.ACTION_PAUSE))
+            builder.addAction(icon, "Pauza", action(context, SenderService.ACTION_PAUSE))
         }
-        builder.addAction(0, "To'xtatish", action(context, SenderService.ACTION_STOP))
+        builder.addAction(icon, "To'xtatish", action(context, SenderService.ACTION_STOP))
         return builder.build()
     }
 }

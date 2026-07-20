@@ -38,5 +38,7 @@ class SmsDeliverReceiver : BroadcastReceiver() {
         } catch (e: Exception) {
             // Provider write can fail if we're not actually the default app — nothing else to do.
         }
+        // As the default app we own the incoming notification, so the user still gets alerted.
+        uz.ownsms.sender.service.Notifications.notifyIncoming(context, sender, body)
     }
 }
