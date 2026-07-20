@@ -178,8 +178,9 @@
     <string name="settings_defsms_title">Standart SMS ilovasi</string>
     <string name="settings_defsms_on">Ilova standart SMS ilovasi — ommaviy yuborish to\'siqsiz</string>
     <string name="settings_defsms_off">Standart emas — ko\'p SMS yuborilganda tizim bloklashi mumkin</string>
-    <string name="settings_defsms_hint">Standart SMS ilovasi qilinса, tizimning \"ko\'p SMS\" cheklovi olib tashlanadi. Kiruvchi SMS\'lar saqlanadi va boshqa messenger\'да ko\'rinaveradi.</string>
+    <string name="settings_defsms_hint">Ko\'p SMS yuborganда tizim \"juda ko\'p SMS\" deb bloklamasligi uchun ilovани standart SMS ilovasi qiling — blok faqat shundaгина to\'liq yo\'qoladi.</string>
     <string name="settings_defsms_btn">Standart SMS ilovasi qilish</string>
+    <string name="home_defsms_warning">⚠ Ilova standart SMS ilovasi emas — ko\'p SMS yuborganда ayrimlari bloklanishi yoki tizim to\'sib qo\'yishi mumkin. Sozlash uchun bosing.</string>
     <string name="msg_start_blocked">Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->
@@ -215,6 +216,10 @@
     <string name="bulk_pause">Pauza</string>
     <string name="bulk_resume">Davom</string>
     <string name="bulk_cancel">Bekor qilish</string>
+    <string name="bulk_hide">Yashirish</string>
+    <string name="bulk_cancel_dismiss">Yo\'q</string>
+    <string name="bulk_cancel_confirm_title">Rassilkani bekor qilasizmi?</string>
+    <string name="bulk_cancel_confirm_text">Navbatdagi hali yuborilmagan xabarlar to\'xtatiladi. Bu amalni ortga qaytarib bo\'lmaydi.</string>
     <string name="bulk_history_title">Oxirgi rassilkalar</string>
     <string name="bulk_history_total">%1$d ta</string>
 </resources>

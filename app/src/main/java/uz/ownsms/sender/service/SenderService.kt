@@ -54,6 +54,9 @@ class SenderService : Service() {
             ACTION_STOP -> {
                 ServiceLocator.settings.enabled = false
                 WatchdogWorker.cancel(applicationContext)
+                loop?.cancel()
+                reporter?.cancel()
+                stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -88,6 +91,11 @@ class SenderService : Service() {
         reconcile()
         while (scope.isActive) {
             try {
+                if (!ServiceLocator.settings.enabled) {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
+                    return
+                }
                 if (!ServiceLocator.settings.isConfigured) {
                     notify("Sozlanmagan — API URL va token kiriting")
                     delay(10_000)
@@ -185,17 +193,19 @@ class SenderService : Service() {
 
     private suspend fun reportOutcomes() {
         val api = ServiceLocator.api()
-        // "sent" is reported once; we keep the job to await delivery/failure.
-        for (job in dao.byState(JobState.SENT)) {
-            if (job.sentReported) continue
+        // 1. Report "sent" for every job that left the SIM — including ones that already raced to
+        //    "delivered" locally. The server only accepts "delivered" from the "sent" state, so if we
+        //    skip "sent" the delivered report is silently ignored and the job dies on lease timeout.
+        for (job in dao.needsSentReport()) {
             try {
                 api.reportStatus(job.id, StatusReport(status = "sent"))
                 dao.setSentReported(job.id, true)
             } catch (e: Exception) { /* retry next iteration */ }
         }
-        // Terminal outcomes: report once, then keep the row as history (marked reported).
+        // 2. Terminal outcomes: delivered only after "sent" is on record; failed is accepted anytime.
         for (state in listOf(JobState.DELIVERED, JobState.FAILED)) {
             for (job in dao.unreported(state)) {
+                if (state == JobState.DELIVERED && !job.sentReported) continue // wait for sent to land
                 try {
                     api.reportStatus(job.id, StatusReport(status = state, error_code = job.errorCode))
                     dao.markReported(job.id)

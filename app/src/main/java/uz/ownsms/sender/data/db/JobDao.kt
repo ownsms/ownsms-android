@@ -21,6 +21,12 @@ interface JobDao {
     @Query("SELECT * FROM jobs WHERE state = :state AND reported = 0 ORDER BY id")
     suspend fun unreported(state: String): List<JobEntity>
 
+    // Jobs that successfully left the SIM (sent OR already delivered) but haven't reported "sent" yet.
+    // The server only accepts delivered from the "sent" state, so "sent" must be reported first even
+    // for a job that raced straight to delivered before the reporter's tick.
+    @Query("SELECT * FROM jobs WHERE sentReported = 0 AND state IN ('sent', 'delivered') ORDER BY id")
+    suspend fun needsSentReport(): List<JobEntity>
+
     @Query("UPDATE jobs SET reported = 1 WHERE id = :id")
     suspend fun markReported(id: Long)
 

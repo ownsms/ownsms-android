@@ -178,8 +178,9 @@
     <string name="settings_defsms_title">SMS-приложение по умолчанию</string>
     <string name="settings_defsms_on">Приложение по умолчанию — массовая отправка без блокировки</string>
     <string name="settings_defsms_off">Не по умолчанию — система может заблокировать при массовой отправке</string>
-    <string name="settings_defsms_hint">Если сделать приложением SMS по умолчанию, системное ограничение «слишком много SMS» снимается. Входящие SMS сохраняются и видны в других мессенджерах.</string>
+    <string name="settings_defsms_hint">Чтобы система не блокировала «слишком много SMS» при массовой отправке, сделайте приложение SMS по умолчанию — только так блокировка снимается полностью.</string>
     <string name="settings_defsms_btn">Сделать приложением SMS по умолчанию</string>
+    <string name="home_defsms_warning">⚠ Приложение не является SMS по умолчанию — при массовой отправке часть SMS может блокироваться. Нажмите для настройки.</string>
     <string name="msg_start_blocked">Перед запуском предоставьте все разрешения и выберите SIM.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->
@@ -215,6 +216,10 @@
     <string name="bulk_pause">Пауза</string>
     <string name="bulk_resume">Продолжить</string>
     <string name="bulk_cancel">Отменить</string>
+    <string name="bulk_hide">Скрыть</string>
+    <string name="bulk_cancel_dismiss">Нет</string>
+    <string name="bulk_cancel_confirm_title">Отменить рассылку?</string>
+    <string name="bulk_cancel_confirm_text">Ещё не отправленные сообщения в очереди будут остановлены. Действие необратимо.</string>
     <string name="bulk_history_title">Последние рассылки</string>
     <string name="bulk_history_total">%1$d шт.</string>
 </resources>

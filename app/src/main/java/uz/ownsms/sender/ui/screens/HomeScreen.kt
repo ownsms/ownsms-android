@@ -40,6 +40,7 @@ import java.time.OffsetDateTime
 fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
     val enabled by vm.enabled.collectAsState()
     val canStart by vm.canStart.collectAsState()
+    val isDefaultSms by vm.isDefaultSms.collectAsState()
     val recent by vm.recent.collectAsState()
     val apiKey by vm.apiKey.collectAsState()
     val serverStatus by vm.serverStatus.collectAsState()
@@ -105,6 +106,22 @@ fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
                 Text(
                     stringResource(R.string.home_missing_perms_notice),
                     color = StatusQueued,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(14.dp),
+                )
+            }
+        }
+
+        if (!isDefaultSms) {
+            Surface(
+                onClick = onOpenSettings,
+                shape = RoundedCornerShape(14.dp),
+                color = StatusFailed.copy(alpha = 0.10f),
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    stringResource(R.string.home_defsms_warning),
+                    color = StatusFailed,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(14.dp),
                 )

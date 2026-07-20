@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -149,13 +152,21 @@ fun BulkScreen(vm: BulkViewModel) {
 
 @Composable
 private fun ActiveCampaignCard(d: CampaignDetail, loading: Boolean, onAction: (String) -> Unit, onClose: () -> Unit) {
+    var confirmCancel by remember { mutableStateOf(false) }
+    val done = d.progress.sent + d.progress.delivered
+    val terminal = d.status in setOf("completed", "canceled")
+
     SectionCard(stringResource(R.string.bulk_progress_title)) {
-        Text(progressLine(d.progress, d.total), style = MaterialTheme.typography.bodyMedium)
+        val frac = if (d.total > 0) done.toFloat() / d.total else 0f
+        LinearProgressIndicator(progress = { frac }, modifier = Modifier.fillMaxWidth())
+        Text("$done / ${d.total}", style = MaterialTheme.typography.titleMedium)
+        Text(progressLine(d.progress, d.total), style = MaterialTheme.typography.bodySmall)
         Text(
             stringResource(R.string.bulk_progress_status, d.status),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        // Non-destructive controls: pause/resume + hide (does NOT stop the campaign).
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             when (d.status) {
                 "running", "scheduled" -> OutlinedButton(onClick = { onAction("pause") }, enabled = !loading) {
@@ -165,13 +176,35 @@ private fun ActiveCampaignCard(d: CampaignDetail, loading: Boolean, onAction: (S
                     Text(stringResource(R.string.bulk_resume))
                 }
             }
-            if (d.status !in setOf("completed", "canceled")) {
-                OutlinedButton(onClick = { onAction("cancel") }, enabled = !loading) {
-                    Text(stringResource(R.string.bulk_cancel))
-                }
-            }
-            TextButton(onClick = onClose) { Text(stringResource(R.string.common_close)) }
+            TextButton(onClick = onClose) { Text(stringResource(R.string.bulk_hide)) }
         }
+        // Destructive cancel is separated and confirmed so it can't be tapped by accident.
+        if (!terminal) {
+            TextButton(
+                onClick = { confirmCancel = true },
+                enabled = !loading,
+                colors = ButtonDefaults.textButtonColors(contentColor = StatusFailed),
+            ) {
+                Text(stringResource(R.string.bulk_cancel))
+            }
+        }
+    }
+
+    if (confirmCancel) {
+        AlertDialog(
+            onDismissRequest = { confirmCancel = false },
+            title = { Text(stringResource(R.string.bulk_cancel_confirm_title)) },
+            text = { Text(stringResource(R.string.bulk_cancel_confirm_text)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmCancel = false
+                    onAction("cancel")
+                }) { Text(stringResource(R.string.bulk_cancel)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmCancel = false }) { Text(stringResource(R.string.bulk_cancel_dismiss)) }
+            },
+        )
     }
 }
 

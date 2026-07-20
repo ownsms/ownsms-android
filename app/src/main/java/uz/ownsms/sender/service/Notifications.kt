@@ -51,7 +51,12 @@ object Notifications {
 
     private fun action(context: Context, act: String): PendingIntent {
         val intent = Intent(context, SenderService::class.java).setAction(act)
-        return PendingIntent.getService(context, act.hashCode(), intent, PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getService(
+            context,
+            act.hashCode(),
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
     }
 
     fun build(context: Context, text: String, paused: Boolean = false): Notification {

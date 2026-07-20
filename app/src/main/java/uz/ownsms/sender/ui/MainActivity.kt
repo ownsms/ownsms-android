@@ -31,6 +31,8 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult(),
     ) {
         vm.refreshReliability() // re-reads isDefaultSms
+        // Becoming default grants only the SMS permission — prompt for the remaining phone/notif perms.
+        if (!vm.permsGranted.value) requestPerms()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
