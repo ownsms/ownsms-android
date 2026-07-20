@@ -26,14 +26,20 @@ class AccountViewModel(app: Application) : AndroidViewModel(app) {
     val loading = MutableStateFlow(false)
     val error = MutableStateFlow<String?>(null)
 
+    private val app get() = getApplication<Application>()
+
     private fun run(block: suspend () -> Unit) {
+        if (ServiceLocator.settings.apiKey.isBlank()) {
+            error.value = app.getString(uz.ownsms.sender.R.string.err_no_api_key)
+            return
+        }
         viewModelScope.launch {
             loading.value = true
             error.value = null
             try {
                 block()
             } catch (e: Exception) {
-                error.value = e.message ?: "Tarmoq xatosi"
+                error.value = friendlyError(app, e, app.getString(uz.ownsms.sender.R.string.msg_server_unreachable))
             } finally {
                 loading.value = false
             }

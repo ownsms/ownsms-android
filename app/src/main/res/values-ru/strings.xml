@@ -170,6 +170,10 @@
     <string name="msg_test_ok">Тест отправлен: %1$s (%2$s)</string>
     <string name="msg_test_err">Ошибка теста: %1$s</string>
     <string name="msg_server_unreachable">Не удалось связаться с сервером</string>
+    <string name="err_unauthorized">Сессия недействительна — Настройки → перерегистрируйте устройство.</string>
+    <string name="err_no_api_key">Нет API-ключа — перерегистрируйте устройство.</string>
+    <string name="msg_reregister_prompt">Ключи очищены — зарегистрируйтесь заново.</string>
+    <string name="settings_reregister_btn">Перерегистрировать устройство</string>
     <string name="msg_start_blocked">Перед запуском предоставьте все разрешения и выберите SIM.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->

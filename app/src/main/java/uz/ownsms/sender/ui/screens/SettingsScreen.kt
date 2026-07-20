@@ -104,6 +104,12 @@ fun SettingsScreen(vm: MainViewModel, accountVm: AccountViewModel, onRequestPerm
                 ) {
                     Text(stringResource(R.string.settings_generate_pair_btn))
                 }
+                FilledTonalButton(
+                    onClick = { vm.reRegister() },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.settings_reregister_btn))
+                }
             }
 
             RateOverridesCard(vm)

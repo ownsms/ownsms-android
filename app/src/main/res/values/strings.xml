@@ -170,6 +170,10 @@
     <string name="msg_test_ok">Test yuborildi: %1$s (%2$s)</string>
     <string name="msg_test_err">Test xatosi: %1$s</string>
     <string name="msg_server_unreachable">Server bilan bog\'lanib bo\'lmadi</string>
+    <string name="err_unauthorized">Sessiya yaroqsiz — Sozlamalar → qurilmani qayta ro\'yxatdan o\'tkazing.</string>
+    <string name="err_no_api_key">API kalit yo\'q — qurilmani qayta ro\'yxatdan o\'tkazing.</string>
+    <string name="msg_reregister_prompt">Kalitlar tozalandi — qayta ro\'yxatdan o\'ting.</string>
+    <string name="settings_reregister_btn">Qurilmani qayta ro\'yxatdan o\'tkazish</string>
     <string name="msg_start_blocked">Ishga tushirishdan oldin barcha ruxsatlarni bering va SIM tanlang.</string>
 
     <!-- Onboarding SIM step + email (OnboardingScreen.kt) -->

@@ -84,7 +84,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 hasMoreServer.value = page.next_before != null
                 serverLoadedOnce = true
             } catch (e: Exception) {
-                serverError.value = e.message ?: app.getString(R.string.msg_server_unreachable)
+                serverError.value = friendlyError(app, e, app.getString(R.string.msg_server_unreachable))
             } finally {
                 loading.value = false
             }
@@ -108,7 +108,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 nextBefore = page.next_before
                 hasMoreServer.value = page.next_before != null
             } catch (e: Exception) {
-                serverError.value = e.message ?: app.getString(R.string.msg_server_unreachable)
+                serverError.value = friendlyError(app, e, app.getString(R.string.msg_server_unreachable))
             } finally {
                 loading.value = false
             }
@@ -137,6 +137,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         reliability.value = reliabilityChecker.checks()
         ready.value = reliabilityChecker.isReady()
         permsGranted.value = reliabilityChecker.permissionsGranted()
+        // Re-read enabled so the Home toggle reflects a Stop done from the notification.
+        enabled.value = settings.enabled
         recomputeCanStart()
     }
 
@@ -201,17 +203,32 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             message.value = app.getString(R.string.msg_need_number)
             return
         }
+        if (settings.apiKey.isBlank()) {
+            message.value = app.getString(R.string.err_no_api_key)
+            return
+        }
         viewModelScope.launch {
             loading.value = true
             try {
                 val res = ServiceLocator.devApi().sendMessage(SendMessageReq(to = to, text = text.ifBlank { "ownsms test" }))
                 message.value = app.getString(R.string.msg_test_ok, res.id, res.status)
             } catch (e: Exception) {
-                message.value = app.getString(R.string.msg_test_err, e.message ?: "")
+                message.value = friendlyError(app, e, app.getString(R.string.msg_test_err, ""))
             } finally {
                 loading.value = false
             }
         }
+    }
+
+    /** Clear the stored credentials and return to onboarding — recovery when the server rejects them (401). */
+    fun reRegister() {
+        stop()
+        settings.deviceToken = ""
+        settings.apiKey = ""
+        token.value = ""
+        apiKey.value = ""
+        recomputeCanStart()
+        message.value = app.getString(R.string.msg_reregister_prompt)
     }
 
     private fun simRegs(): List<SimReg> = sims.value.map {
