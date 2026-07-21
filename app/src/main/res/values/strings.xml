@@ -208,6 +208,7 @@
     <string name="bulk_bad_rows_title">Xatolar — hech biri yuborilmadi</string>
     <string name="bulk_has_bad_rows">Ba\'zi raqamlar noto\'g\'ri. Tuzatib qayta yuboring — hech biri yuborilmadi.</string>
     <string name="bulk_bad_row">%1$d-qator: %2$s — %3$s</string>
+    <string name="bulk_remove_bad_rows">Noto\'g\'ri qatorlarni olib tashlash</string>
     <string name="bulk_reason_invalid_phone">raqam noto\'g\'ri</string>
     <string name="bulk_reason_missing_to">raqam yo\'q</string>
     <string name="bulk_reason_other">xato</string>

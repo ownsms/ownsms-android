@@ -114,6 +114,9 @@ fun BulkScreen(vm: BulkViewModel) {
                         color = StatusFailed,
                     )
                 }
+                TextButton(onClick = { vm.removeBadRows() }) {
+                    Text(stringResource(R.string.bulk_remove_bad_rows))
+                }
             }
         }
 

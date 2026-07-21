@@ -96,6 +96,17 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** Drop the lines the server rejected so the user can resend the valid rest (create is atomic). */
+    fun removeBadRows() {
+        val bad = badRows.value.map { it.line }.toSet()
+        if (bad.isEmpty()) return
+        numbersText.value = numbersText.value.split("\n")
+            .filterIndexed { i, _ -> (i + 1) !in bad }
+            .joinToString("\n")
+        badRows.value = emptyList()
+        message.value = null
+    }
+
     private fun mapBadRows(e: HttpException, parsed: List<ParsedRecipient>) {
         val body = runCatching { errorAdapter.fromJson(e.response()?.errorBody()?.string().orEmpty()) }.getOrNull()
         badRows.value = body?.error?.bad_rows.orEmpty().mapNotNull { br ->

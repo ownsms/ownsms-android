@@ -133,10 +133,15 @@ class SenderService : Service() {
         }
     }
 
-    /** Restart-uncertain jobs (in-flight at crash) → failed; at-most-once means we never resend them. */
+    /**
+     * Jobs in-flight at a crash → assume SENT (never resend — at-most-once). The SIM/telephony stack
+     * almost certainly already accepted them (the send handoff is synchronous and outlives our process),
+     * so reporting "sent" — not "failed" — stops SMS that actually went out from showing as
+     * "app_restart" errors, and lets the server accept them within the job lease.
+     */
     private suspend fun reconcile() {
         for (job in dao.byState(JobState.SENDING)) {
-            dao.setState(job.id, JobState.FAILED, "app_restart_uncertain")
+            dao.setState(job.id, JobState.SENT)
         }
     }
 
@@ -182,6 +187,13 @@ class SenderService : Service() {
             dao.setState(job.id, JobState.SENDING)
             try {
                 sender.send(job.id, job.to, job.text, sub)
+                // Optimistically mark SENT the moment the SIM accepts the handoff, so the "sent"
+                // report reaches the server inside its job lease even if the sent PendingIntent never
+                // fires (common on MIUI) or the service is killed right after. A real failure still
+                // arrives via SmsResultReceiver and downgrades to failed (server accepts sent→failed).
+                // ponytail: reports sent before delivery confirmation; the only new false-success is a
+                // silent drop with no error intent — already indistinguishable from a billing reject.
+                dao.setState(job.id, JobState.SENT)
                 if (simCfg != null) rateGate.record(sub, now)
             } catch (e: Exception) {
                 dao.setState(job.id, JobState.FAILED, "send_exception")

@@ -39,10 +39,13 @@ class SmsSender(private val context: Context) {
      */
     private fun writeToSentBox(to: String, text: String) {
         if (context.packageName != Telephony.Sms.getDefaultSmsPackage(context)) return
+        val now = System.currentTimeMillis()
         val values = ContentValues().apply {
             put(Telephony.Sms.ADDRESS, to)
             put(Telephony.Sms.BODY, text)
-            put(Telephony.Sms.DATE, System.currentTimeMillis())
+            put(Telephony.Sms.DATE, now)
+            // MIUI's Messages app shows DATE_SENT; without it the row appears dated 1970 ("eski").
+            put(Telephony.Sms.DATE_SENT, now)
             put(Telephony.Sms.TYPE, Telephony.Sms.MESSAGE_TYPE_SENT)
             put(Telephony.Sms.READ, 1)
             put(Telephony.Sms.SEEN, 1)
