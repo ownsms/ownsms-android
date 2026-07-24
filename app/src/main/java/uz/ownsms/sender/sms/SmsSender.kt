@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.provider.Telephony
 import android.telephony.SmsManager
 
@@ -68,6 +69,11 @@ class SmsSender(private val context: Context) {
         // The action still rides along so the receiver can tell sent from delivered.
         val intent = Intent(context, SmsResultReceiver::class.java).apply {
             this.action = action
+            // Unique per (job, part, action): PendingIntent equality keys on data (extras are ignored),
+            // so distinct data keeps each callback its own even when the requestCode below truncates a
+            // large jobId to the same value. Without it, FLAG_UPDATE_CURRENT would let a later send
+            // overwrite an earlier in-flight job's extras and misroute its sent/delivered result.
+            data = Uri.parse("ownsms://result/$jobId/$part/$action")
             putExtra(SmsResultReceiver.EXTRA_JOB_ID, jobId)
             putExtra(SmsResultReceiver.EXTRA_PART, part)
         }

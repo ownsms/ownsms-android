@@ -191,9 +191,11 @@ class SenderService : Service() {
                 // report reaches the server inside its job lease even if the sent PendingIntent never
                 // fires (common on MIUI) or the service is killed right after. A real failure still
                 // arrives via SmsResultReceiver and downgrades to failed (server accepts sent→failed).
-                // ponytail: reports sent before delivery confirmation; the only new false-success is a
-                // silent drop with no error intent — already indistinguishable from a billing reject.
-                dao.setState(job.id, JobState.SENT)
+                // ponytail: reports sent before delivery confirmation; guarded to SENDING (markSentIfSending)
+                // so a real failure/delivery the receiver already committed is never clobbered back to SENT.
+                // The only remaining false-success is a silent drop with no error intent — already
+                // indistinguishable from a billing reject.
+                dao.markSentIfSending(job.id)
                 if (simCfg != null) rateGate.record(sub, now)
             } catch (e: Exception) {
                 dao.setState(job.id, JobState.FAILED, "send_exception")

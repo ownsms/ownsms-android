@@ -49,6 +49,12 @@ interface JobDao {
     @Query("UPDATE jobs SET state = :state, errorCode = :errorCode WHERE id = :id")
     suspend fun setState(id: Long, state: String, errorCode: String? = null)
 
+    // Optimistic post-send advance, guarded to SENDING only: if SmsResultReceiver already committed a
+    // FAILED/DELIVERED for this job (it can fire before this runs), that outcome sticks and is not
+    // clobbered back to a false "sent". A job still in SENDING advances to SENT as intended.
+    @Query("UPDATE jobs SET state = 'sent' WHERE id = :id AND state = 'sending'")
+    suspend fun markSentIfSending(id: Long)
+
     @Query("UPDATE jobs SET sentReported = :reported WHERE id = :id")
     suspend fun setSentReported(id: Long, reported: Boolean)
 
