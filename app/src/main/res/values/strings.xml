@@ -212,6 +212,10 @@
     <string name="bulk_reason_invalid_phone">raqam noto\'g\'ri</string>
     <string name="bulk_reason_missing_to">raqam yo\'q</string>
     <string name="bulk_reason_other">xato</string>
+    <string name="bulk_http_error">Xato: HTTP %1$d</string>
+    <string name="bulk_too_many_recipients">Juda ko\'p raqam (%1$d). Ro\'yxatni %2$d tagacha qisqartiring.</string>
+    <string name="settings_scope_send">Yuborish</string>
+    <string name="settings_scope_read">O\'qish</string>
     <string name="bulk_progress_title">Joriy rassilka</string>
     <string name="bulk_progress_status">Holat: %1$s</string>
     <string name="bulk_pause">Pauza</string>

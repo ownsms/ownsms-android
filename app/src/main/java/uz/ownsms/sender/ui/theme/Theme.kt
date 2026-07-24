@@ -37,6 +37,11 @@ private val DarkColors = darkColorScheme(
     error = StatusFailed,
 )
 
+/** Theme-aware 'sent' status color: the fixed indigo fails WCAG on the dark surface, so dark mode
+ * uses the lighter ultramarine (the dark primary uses the same hue). */
+@Composable
+fun statusSent(): Color = if (isSystemInDarkTheme()) StatusSentDark else StatusSent
+
 @Composable
 fun OwnSmsTheme(dark: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(

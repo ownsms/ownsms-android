@@ -12,3 +12,6 @@ fun parseRecipients(raw: String): List<ParsedRecipient> = raw.split("\n").mapInd
     val t = s.trim()
     if (t.isEmpty()) null else ParsedRecipient(i + 1, t)
 }
+    // ponytail: exact-string dedupe, keep first occurrence so bad-row line mapping stays correct;
+    // +998/998 normalization is left to the server.
+    .distinctBy { it.number }

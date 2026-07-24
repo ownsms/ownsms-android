@@ -17,9 +17,12 @@
     <uses-permission android:name="android.permission.RECEIVE_WAP_PUSH" />
     <uses-permission android:name="android.permission.READ_SMS" />
 
+    <!-- allowBackup=false: send-authorizing device_token + api_key live in SharedPreferences and must
+         not leave the device via Google auto-backup or `adb backup`. -->
     <application
         android:name=".OwnSmsApp"
-        android:allowBackup="true"
+        android:allowBackup="false"
+
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"

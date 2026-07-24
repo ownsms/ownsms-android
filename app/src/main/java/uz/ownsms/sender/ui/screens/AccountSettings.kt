@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import uz.ownsms.sender.R
@@ -63,8 +65,8 @@ private fun KeysCard(vm: AccountViewModel) {
             modifier = Modifier.fillMaxWidth(),
         )
         Row {
-            ScopeCheck("send", send) { send = it }
-            ScopeCheck("read", read) { read = it }
+            ScopeCheck(stringResource(R.string.settings_scope_send), send) { send = it }
+            ScopeCheck(stringResource(R.string.settings_scope_read), read) { read = it }
         }
         OutlinedTextField(
             value = ips,
@@ -100,8 +102,11 @@ private fun KeysCard(vm: AccountViewModel) {
 
 @Composable
 private fun ScopeCheck(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = checked, onCheckedChange = onChange)
+    Row(
+        modifier = Modifier.toggleable(value = checked, role = Role.Checkbox, onValueChange = onChange),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(checked = checked, onCheckedChange = null)
         Text(label)
     }
 }
@@ -172,8 +177,11 @@ private fun WebhookCard(vm: AccountViewModel) {
 
 @Composable
 private fun EventCheck(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = checked, onCheckedChange = onChange)
+    Row(
+        modifier = Modifier.toggleable(value = checked, role = Role.Checkbox, onValueChange = onChange),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(checked = checked, onCheckedChange = null)
         Text(label, style = MaterialTheme.typography.bodyMedium)
     }
 }

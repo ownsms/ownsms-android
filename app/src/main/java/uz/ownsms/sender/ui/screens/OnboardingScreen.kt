@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import uz.ownsms.sender.R
@@ -74,6 +78,7 @@ fun OnboardingScreen(vm: MainViewModel, onRequestPermissions: () -> Unit) {
             onValueChange = { email = it },
             label = { Text(stringResource(R.string.onboarding_email_label)) },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -170,13 +175,21 @@ private fun SimNumberStep(
             label = { Text(sim.displayName) },
             placeholder = { Text(stringResource(R.string.onboarding_sim_number_hint)) },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier.fillMaxWidth(),
         )
         if (sims.size > 1) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.selectable(
+                    selected = sim.subscriptionId == defaultSubId,
+                    role = Role.RadioButton,
+                    onClick = { vm.setDefaultSub(sim.subscriptionId) },
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 RadioButton(
                     selected = sim.subscriptionId == defaultSubId,
-                    onClick = { vm.setDefaultSub(sim.subscriptionId) },
+                    onClick = null,
                 )
                 Text(stringResource(R.string.onboarding_sim_default), style = MaterialTheme.typography.bodySmall)
             }
