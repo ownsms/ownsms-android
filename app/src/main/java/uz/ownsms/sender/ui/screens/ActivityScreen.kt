@@ -50,7 +50,7 @@ import uz.ownsms.sender.ui.components.statusVisual
 import uz.ownsms.sender.ui.theme.Mono
 import uz.ownsms.sender.ui.theme.StatusDelivered
 import uz.ownsms.sender.ui.theme.StatusFailed
-import uz.ownsms.sender.ui.theme.StatusSent
+import uz.ownsms.sender.ui.theme.statusSent
 import java.text.SimpleDateFormat
 import java.time.OffsetDateTime
 import java.util.Date
@@ -131,7 +131,7 @@ fun ActivityScreen(vm: MainViewModel) {
             val shown = if (filter == "all") recent else recent.filter { it.state == filter }
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile(stringResource(R.string.status_sent), sent, StatusSent, Modifier.weight(1f))
+                StatTile(stringResource(R.string.status_sent), sent, statusSent(), Modifier.weight(1f))
                 StatTile(stringResource(R.string.status_delivered), delivered, StatusDelivered, Modifier.weight(1f))
                 StatTile(stringResource(R.string.status_failed), failed, StatusFailed, Modifier.weight(1f))
             }
@@ -202,7 +202,7 @@ private fun ServerActivity(
     }
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        StatTile(stringResource(R.string.status_sent), sent, StatusSent, Modifier.weight(1f))
+        StatTile(stringResource(R.string.status_sent), sent, statusSent(), Modifier.weight(1f))
         StatTile(stringResource(R.string.status_delivered), delivered, StatusDelivered, Modifier.weight(1f))
         StatTile(stringResource(R.string.status_failed), failed, StatusFailed, Modifier.weight(1f))
     }

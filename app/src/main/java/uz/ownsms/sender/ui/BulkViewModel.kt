@@ -8,6 +8,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import uz.ownsms.sender.ServiceLocator
@@ -43,6 +44,14 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
     val active = MutableStateFlow<CampaignDetail?>(null)
     val history = MutableStateFlow(settings.campaignHistory)
     private var pollJob: Job? = null
+
+    init {
+        // Editing the recipients invalidates the 1-based bad-row mapping captured at submit time,
+        // so removeBadRows() can't act on stale line indices.
+        viewModelScope.launch {
+            numbersText.drop(1).collect { if (badRows.value.isNotEmpty()) badRows.value = emptyList() }
+        }
+    }
 
     /**
      * Numbers offered as a campaign `from`: the ones entered at registration (persisted), falling
@@ -87,13 +96,33 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
                 messageText.value = ""
                 open(created.id)
             } catch (e: HttpException) {
-                if (e.code() == 422) mapBadRows(e, parsed) else message.value = "Xato: HTTP ${e.code()}"
+                if (e.code() == 422) {
+                    mapBadRows(e, parsed)
+                } else {
+                    message.value =
+                        getApplication<Application>().getString(uz.ownsms.sender.R.string.bulk_http_error, e.code())
+                }
             } catch (e: Exception) {
-                message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
+                message.value = friendlyError(
+                    getApplication(),
+                    e,
+                    getApplication<Application>().getString(uz.ownsms.sender.R.string.msg_server_unreachable),
+                )
             } finally {
                 loading.value = false
             }
         }
+    }
+
+    /** Drop the lines the server rejected so the user can resend the valid rest (create is atomic). */
+    fun removeBadRows() {
+        val bad = badRows.value.map { it.line }.toSet()
+        if (bad.isEmpty()) return
+        numbersText.value = numbersText.value.split("\n")
+            .filterIndexed { i, _ -> (i + 1) !in bad }
+            .joinToString("\n")
+        badRows.value = emptyList()
+        message.value = null
     }
 
     private fun mapBadRows(e: HttpException, parsed: List<ParsedRecipient>) {
@@ -114,10 +143,14 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
                     active.value = d
                     if (d.status in TERMINAL) break
                 } catch (e: Exception) {
-                    message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
+                    message.value = friendlyError(
+                        getApplication(),
+                        e,
+                        getApplication<Application>().getString(uz.ownsms.sender.R.string.msg_server_unreachable),
+                    )
                     break
                 }
-                delay(5_000L)
+                delay(if (active.value?.status == "scheduled") 60_000L else 5_000L)
             }
         }
     }
@@ -136,7 +169,11 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
                 ServiceLocator.devApi().campaignAction(id, act)
                 open(id)
             } catch (e: Exception) {
-                message.value = friendlyError(getApplication(), e, "Tarmoq xatosi")
+                message.value = friendlyError(
+                    getApplication(),
+                    e,
+                    getApplication<Application>().getString(uz.ownsms.sender.R.string.msg_server_unreachable),
+                )
             } finally {
                 loading.value = false
             }

@@ -22,6 +22,12 @@ class BulkAndOverridesTest {
         assertEquals(listOf(1 to "901", 2 to "902"), parseRecipients("901\r\n902").map { it.line to it.number })
     }
 
+    /** Duplicate numbers collapse to one job (first occurrence kept) so nobody gets two SMS. */
+    @Test fun parse_dedupes_keeping_first_occurrence() {
+        val r = parseRecipients("901\n902\n901\n902")
+        assertEquals(listOf(1 to "901", 2 to "902"), r.map { it.line to it.number })
+    }
+
     /** Server returns bad_rows[index] against the submitted array; index maps back to the typed line. */
     @Test fun bad_row_index_maps_to_source_line() {
         val parsed = parseRecipients("901\n\n902bad\n903")

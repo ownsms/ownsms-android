@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import uz.ownsms.sender.R
 import uz.ownsms.sender.ui.AccountViewModel
@@ -161,6 +163,7 @@ fun SettingsScreen(
                     onValueChange = { testTo = it },
                     label = { Text(stringResource(R.string.settings_phone_label)) },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 OutlinedTextField(
@@ -231,6 +234,7 @@ private fun IntField(label: String, value: String, onChange: (String) -> Unit) {
         onValueChange = { s -> onChange(s.filter { it.isDigit() }) },
         label = { Text(label) },
         singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         modifier = Modifier.fillMaxWidth(),
     )
 }

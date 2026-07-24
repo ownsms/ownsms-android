@@ -30,9 +30,14 @@ interface JobDao {
     @Query("UPDATE jobs SET reported = 1 WHERE id = :id")
     suspend fun markReported(id: Long)
 
-    // Only fully-reported rows are prunable; unreported terminal/awaiting-delivery rows are kept
-    // so a delivered/sent report is never dropped before it reaches the server.
-    @Query("DELETE FROM jobs WHERE reported = 1 AND id NOT IN (SELECT id FROM jobs ORDER BY id DESC LIMIT :keep)")
+    // Prunable once a row has reported either its terminal state (reported=1, set on delivered/failed)
+    // OR its "sent" (sentReported=1). UZ operators routinely drop DLRs, so most jobs stall at
+    // state='sent' with reported=0 forever; keying prune only on reported=1 let the table grow ~1 row
+    // per SMS and made the cap a no-op. The newest :keep rows are always retained, so a late
+    // delivered/failed downgrade inside the lease is preserved.
+    // ponytail: not unit-tested — no Robolectric/Room-in-JVM harness exists here and adding one is a new
+    // dependency; this is a reviewed one-line predicate change.
+    @Query("DELETE FROM jobs WHERE (reported = 1 OR sentReported = 1) AND id NOT IN (SELECT id FROM jobs ORDER BY id DESC LIMIT :keep)")
     suspend fun prune(keep: Int)
 
     @Query("SELECT * FROM jobs ORDER BY id DESC LIMIT :limit")
@@ -43,6 +48,12 @@ interface JobDao {
 
     @Query("UPDATE jobs SET state = :state, errorCode = :errorCode WHERE id = :id")
     suspend fun setState(id: Long, state: String, errorCode: String? = null)
+
+    // Optimistic post-send advance, guarded to SENDING only: if SmsResultReceiver already committed a
+    // FAILED/DELIVERED for this job (it can fire before this runs), that outcome sticks and is not
+    // clobbered back to a false "sent". A job still in SENDING advances to SENT as intended.
+    @Query("UPDATE jobs SET state = 'sent' WHERE id = :id AND state = 'sending'")
+    suspend fun markSentIfSending(id: Long)
 
     @Query("UPDATE jobs SET sentReported = :reported WHERE id = :id")
     suspend fun setSentReported(id: Long, reported: Boolean)

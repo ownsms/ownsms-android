@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import uz.ownsms.sender.R
+import uz.ownsms.sender.ServiceLocator
 import uz.ownsms.sender.data.remote.CampaignDetail
 import uz.ownsms.sender.data.remote.CampaignProgress
 import uz.ownsms.sender.ui.BulkViewModel
@@ -63,7 +64,7 @@ fun BulkScreen(vm: BulkViewModel) {
     val history by vm.history.collectAsState()
 
     val count = remember(numbers) { vm.recipientCount }
-    val fromOptions = remember(numbers) { vm.fromNumbers() }
+    val fromOptions = remember(ServiceLocator.settings.registeredNumbers) { vm.fromNumbers() }
 
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
@@ -84,6 +85,13 @@ fun BulkScreen(vm: BulkViewModel) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            if (count > MAX_RECIPIENTS) {
+                Text(
+                    stringResource(R.string.bulk_too_many_recipients, count, MAX_RECIPIENTS),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = StatusFailed,
+                )
+            }
             OutlinedTextField(
                 value = text,
                 onValueChange = { vm.messageText.value = it },
@@ -114,11 +122,14 @@ fun BulkScreen(vm: BulkViewModel) {
                         color = StatusFailed,
                     )
                 }
+                TextButton(onClick = { vm.removeBadRows() }) {
+                    Text(stringResource(R.string.bulk_remove_bad_rows))
+                }
             }
         }
 
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = { vm.send() }, enabled = !loading && count > 0) {
+            Button(onClick = { vm.send() }, enabled = !loading && count > 0 && count <= MAX_RECIPIENTS) {
                 Text(stringResource(R.string.bulk_send_btn))
             }
             if (loading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
@@ -157,7 +168,7 @@ private fun ActiveCampaignCard(d: CampaignDetail, loading: Boolean, onAction: (S
     val terminal = d.status in setOf("completed", "canceled")
 
     SectionCard(stringResource(R.string.bulk_progress_title)) {
-        val frac = if (d.total > 0) done.toFloat() / d.total else 0f
+        val frac = campaignProgressFraction(d.progress, d.total, terminal)
         LinearProgressIndicator(progress = { frac }, modifier = Modifier.fillMaxWidth())
         Text("$done / ${d.total}", style = MaterialTheme.typography.titleMedium)
         Text(progressLine(d.progress, d.total), style = MaterialTheme.typography.bodySmall)
@@ -274,6 +285,18 @@ private fun SendAtRow(sendAt: Long?, onPick: (Long) -> Unit, onClear: () -> Unit
         }
         if (sendAt != null) TextButton(onClick = onClear) { Text(stringResource(R.string.bulk_schedule_clear)) }
     }
+}
+
+private const val MAX_RECIPIENTS = 1000
+
+/**
+ * Progress bar fraction. Resolved = every terminal recipient state, so a campaign that finishes with
+ * failures still fills to 100% instead of appearing stuck at (sent+delivered)/total.
+ */
+fun campaignProgressFraction(p: CampaignProgress, total: Int, terminal: Boolean): Float {
+    if (total <= 0) return 0f
+    if (terminal) return 1f
+    return ((p.sent + p.delivered + p.failed + p.expired + p.canceled).toFloat() / total).coerceIn(0f, 1f)
 }
 
 private fun reasonRes(code: String): Int = when (code) {

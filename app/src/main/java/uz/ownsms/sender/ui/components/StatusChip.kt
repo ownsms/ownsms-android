@@ -17,7 +17,7 @@ import uz.ownsms.sender.ui.theme.StatusDelivered
 import uz.ownsms.sender.ui.theme.StatusFailed
 import uz.ownsms.sender.ui.theme.StatusMuted
 import uz.ownsms.sender.ui.theme.StatusQueued
-import uz.ownsms.sender.ui.theme.StatusSent
+import uz.ownsms.sender.ui.theme.statusSent
 
 data class StatusVisual(val label: String, val glyph: String, val color: Color)
 
@@ -26,7 +26,7 @@ data class StatusVisual(val label: String, val glyph: String, val color: Color)
 fun statusVisual(state: String): StatusVisual = when (state) {
     "queued" -> StatusVisual(stringResource(R.string.status_queued), "•", StatusQueued)
     "sending", "dispatched" -> StatusVisual(stringResource(R.string.status_sending), "↑", StatusQueued)
-    "sent" -> StatusVisual(stringResource(R.string.status_sent), "✓", StatusSent)
+    "sent" -> StatusVisual(stringResource(R.string.status_sent), "✓", statusSent())
     "delivered" -> StatusVisual(stringResource(R.string.status_delivered), "✓✓", StatusDelivered)
     "failed" -> StatusVisual(stringResource(R.string.status_failed), "✕", StatusFailed)
     "expired" -> StatusVisual(stringResource(R.string.status_expired), "⌛", StatusMuted)

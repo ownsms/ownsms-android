@@ -208,9 +208,14 @@
     <string name="bulk_bad_rows_title">Ошибки — ничего не отправлено</string>
     <string name="bulk_has_bad_rows">Некоторые номера неверны. Исправьте и отправьте снова — ничего не отправлено.</string>
     <string name="bulk_bad_row">Строка %1$d: %2$s — %3$s</string>
+    <string name="bulk_remove_bad_rows">Удалить неверные строки</string>
     <string name="bulk_reason_invalid_phone">неверный номер</string>
     <string name="bulk_reason_missing_to">нет номера</string>
     <string name="bulk_reason_other">ошибка</string>
+    <string name="bulk_http_error">Ошибка: HTTP %1$d</string>
+    <string name="bulk_too_many_recipients">Слишком много номеров (%1$d). Сократите список до %2$d.</string>
+    <string name="settings_scope_send">Отправка</string>
+    <string name="settings_scope_read">Чтение</string>
     <string name="bulk_progress_title">Текущая рассылка</string>
     <string name="bulk_progress_status">Статус: %1$s</string>
     <string name="bulk_pause">Пауза</string>

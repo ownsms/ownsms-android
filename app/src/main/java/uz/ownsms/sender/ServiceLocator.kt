@@ -23,9 +23,9 @@ object ServiceLocator {
         settings = Settings(app)
     }
 
-    /** A fresh API client bound to the currently configured base URL + device token. */
-    fun api(): OwnSmsApi = ApiClient.create(settings.baseUrl, settings.deviceToken)
+    /** The device API, bound to the configured base URL; the device token is read per request. */
+    fun api(): OwnSmsApi = ApiClient.device(settings.baseUrl) { settings.deviceToken }
 
-    /** The developer-facing API, authenticated with the account's api_key. */
-    fun devApi(): DevApi = ApiClient.retrofit(settings.baseUrl, settings.apiKey).create(DevApi::class.java)
+    /** The developer-facing API, authenticated per request with the account's api_key. */
+    fun devApi(): DevApi = ApiClient.dev(settings.baseUrl) { settings.apiKey }
 }

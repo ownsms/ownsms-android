@@ -32,7 +32,7 @@ import uz.ownsms.sender.ui.theme.LiveGreen
 import uz.ownsms.sender.ui.theme.StatusDelivered
 import uz.ownsms.sender.ui.theme.StatusFailed
 import uz.ownsms.sender.ui.theme.StatusQueued
-import uz.ownsms.sender.ui.theme.StatusSent
+import uz.ownsms.sender.ui.theme.statusSent
 import java.time.LocalDate
 import java.time.OffsetDateTime
 
@@ -132,7 +132,7 @@ fun HomeScreen(vm: MainViewModel, onOpenSettings: () -> Unit) {
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            StatCard(stringResource(R.string.status_sent), sent, StatusSent, Modifier.weight(1f))
+            StatCard(stringResource(R.string.status_sent), sent, statusSent(), Modifier.weight(1f))
             StatCard(stringResource(R.string.status_delivered), delivered, StatusDelivered, Modifier.weight(1f))
             StatCard(stringResource(R.string.status_failed), failed, StatusFailed, Modifier.weight(1f))
         }
