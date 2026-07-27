@@ -13,8 +13,8 @@ android {
         applicationId = "uz.ownsms.sender"
         minSdk = 26
         targetSdk = 34
-        versionCode = 7
-        versionName = "1.2.3"
+        versionCode = 8
+        versionName = "1.2.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

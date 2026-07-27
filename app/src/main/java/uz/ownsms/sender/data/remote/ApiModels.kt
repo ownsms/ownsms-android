@@ -98,7 +98,13 @@ typealias SentMessage = DevMessage
  * GET `/api/v1/messages` response. `next_before` is the raw integer pk of the last row (NOT the
  * "msg_"-prefixed `id` string) — pass it straight back as the `before` query param to page further.
  */
-data class MessagesPage(val data: List<DevMessage> = emptyList(), val next_before: Long? = null)
+data class MessagesPage(
+    val data: List<DevMessage> = emptyList(),
+    val next_before: Long? = null,
+    // Per-status totals for the whole account (server >= 0.3.8), so the activity tiles report the
+    // real numbers instead of counting the page that happens to be loaded. Empty on older servers.
+    val counts: Map<String, Int> = emptyMap(),
+)
 
 data class DeviceSim(val number: String? = null, val operator: String? = null, val is_default: Boolean = false)
 

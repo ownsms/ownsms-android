@@ -167,6 +167,9 @@ class BulkViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 // The action response omits progress/total; re-poll for the full detail (also covers cancel).
                 ServiceLocator.devApi().campaignAction(id, act)
+                // The server cancels its own queue, but jobs it already handed to this phone live in
+                // the local table — drop them, otherwise cancel keeps sending what was claimed.
+                if (act == "cancel") ServiceLocator.db.jobDao().deleteClaimed()
                 open(id)
             } catch (e: Exception) {
                 message.value = friendlyError(

@@ -30,6 +30,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,18 +72,26 @@ private enum class Source { LOCAL, SERVER }
 @Composable
 fun ActivityScreen(vm: MainViewModel) {
     val recent by vm.recent.collectAsState()
+    val localCounts by vm.localCounts.collectAsState()
     val apiKey by vm.apiKey.collectAsState()
     val serverMessages by vm.serverMessages.collectAsState()
+    val serverCounts by vm.serverCounts.collectAsState()
     val serverError by vm.serverError.collectAsState()
     val loading by vm.loading.collectAsState()
     val hasMoreServer by vm.hasMoreServer.collectAsState()
 
-    var source by remember { mutableStateOf(Source.LOCAL) }
+    // Default to the server view: the phone only keeps a bounded slice of recent jobs, so the
+    // account-wide numbers are the honest report of what a campaign actually did.
+    var source by remember { mutableStateOf(Source.SERVER) }
     var filter by remember { mutableStateOf("all") }
     var selectedLocal by remember { mutableStateOf<JobEntity?>(null) }
     var selectedServer by remember { mutableStateOf<DevMessage?>(null) }
 
     val effectiveSource = if (apiKey.isBlank()) Source.LOCAL else source
+
+    LaunchedEffect(effectiveSource) {
+        if (effectiveSource == Source.SERVER) vm.loadServerOnce()
+    }
 
     Column(
         modifier = Modifier
@@ -117,6 +126,7 @@ fun ActivityScreen(vm: MainViewModel) {
         if (effectiveSource == Source.SERVER) {
             ServerActivity(
                 messages = serverMessages,
+                counts = serverCounts,
                 error = serverError,
                 loading = loading,
                 hasMore = hasMoreServer,
@@ -125,15 +135,20 @@ fun ActivityScreen(vm: MainViewModel) {
                 onSelect = { selectedServer = it },
             )
         } else {
-            val sent = recent.count { it.state == "sent" }
-            val delivered = recent.count { it.state == "delivered" }
-            val failed = recent.count { it.state == "failed" }
+            // Counted over the whole local table (the list below still shows only the newest rows).
+            val pending = (localCounts["claimed"] ?: 0) + (localCounts["sending"] ?: 0)
             val shown = if (filter == "all") recent else recent.filter { it.state == filter }
 
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile(stringResource(R.string.status_sent), sent, statusSent(), Modifier.weight(1f))
-                StatTile(stringResource(R.string.status_delivered), delivered, StatusDelivered, Modifier.weight(1f))
-                StatTile(stringResource(R.string.status_failed), failed, StatusFailed, Modifier.weight(1f))
+                StatTile(stringResource(R.string.status_queued), pending, MaterialTheme.colorScheme.primary, Modifier.weight(1f))
+                StatTile(stringResource(R.string.status_sent), localCounts["sent"] ?: 0, statusSent(), Modifier.weight(1f))
+                StatTile(
+                    stringResource(R.string.status_delivered),
+                    localCounts["delivered"] ?: 0,
+                    StatusDelivered,
+                    Modifier.weight(1f),
+                )
+                StatTile(stringResource(R.string.status_failed), localCounts["failed"] ?: 0, StatusFailed, Modifier.weight(1f))
             }
 
             Row(
@@ -175,6 +190,7 @@ fun ActivityScreen(vm: MainViewModel) {
 @Composable
 private fun ServerActivity(
     messages: List<DevMessage>,
+    counts: Map<String, Int>,
     error: String?,
     loading: Boolean,
     hasMore: Boolean,
@@ -182,9 +198,16 @@ private fun ServerActivity(
     onLoadMore: () -> Unit,
     onSelect: (DevMessage) -> Unit,
 ) {
-    val sent = messages.count { it.status == "sent" }
-    val delivered = messages.count { it.status == "delivered" }
-    val failed = messages.count { it.status == "failed" }
+    // Account-wide totals from the server (0.3.8+). Older servers send none, so fall back to
+    // counting the loaded page — wrong for a big campaign, but the best the response allows.
+    fun total(vararg statuses: String): Int {
+        if (counts.isEmpty()) return messages.count { it.status in statuses }
+        return statuses.sumOf { counts[it] ?: 0 }
+    }
+    val pending = total("queued", "sending")
+    val sent = total("sent")
+    val delivered = total("delivered")
+    val failed = total("failed")
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -202,6 +225,7 @@ private fun ServerActivity(
     }
 
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        StatTile(stringResource(R.string.status_queued), pending, MaterialTheme.colorScheme.primary, Modifier.weight(1f))
         StatTile(stringResource(R.string.status_sent), sent, statusSent(), Modifier.weight(1f))
         StatTile(stringResource(R.string.status_delivered), delivered, StatusDelivered, Modifier.weight(1f))
         StatTile(stringResource(R.string.status_failed), failed, StatusFailed, Modifier.weight(1f))

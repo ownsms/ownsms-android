@@ -108,6 +108,17 @@ class SenderService : Service() {
                 }
                 refreshConfigIfStale()
                 sendClaimed()
+                // Backpressure: never claim a new batch while claimed jobs are still waiting here.
+                // The server leases every job it hands over for a fixed window, but sending is paced
+                // (jitter + per-SIM rate limits), so polling on every pass piled up hundreds of
+                // claimed-but-unsent jobs — they aged out as lease_timeout failures, and "cancel"
+                // could not stop a queue that already lived on the phone.
+                val backlog = dao.countByState(JobState.CLAIMED)
+                if (backlog > 0) {
+                    notify("Navbatda $backlog ta xabar")
+                    delay(3_000)
+                    continue
+                }
                 notify("Ulangan. Kutilmoqda…")
                 poll()
             } catch (e: CancellationException) {
