@@ -6,6 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
+/** One row of [JobDao.stateCountsFlow]: how many local jobs sit in [state]. */
+data class StateCount(val state: String, val n: Int)
+
 @Dao
 interface JobDao {
 
@@ -17,6 +20,15 @@ interface JobDao {
 
     @Query("SELECT * FROM jobs WHERE state = :state ORDER BY id")
     suspend fun byState(state: String): List<JobEntity>
+
+    @Query("SELECT COUNT(*) FROM jobs WHERE state = :state")
+    suspend fun countByState(state: String): Int
+
+    // Cancelling a campaign has to drop what this phone already claimed but hasn't handed to the SIM
+    // yet — the server can only cancel its own queue, so without this the local backlog keeps sending
+    // after the user pressed cancel.
+    @Query("DELETE FROM jobs WHERE state = 'claimed'")
+    suspend fun deleteClaimed(): Int
 
     @Query("SELECT * FROM jobs WHERE state = :state AND reported = 0 ORDER BY id")
     suspend fun unreported(state: String): List<JobEntity>
@@ -45,6 +57,11 @@ interface JobDao {
 
     @Query("SELECT * FROM jobs ORDER BY id DESC LIMIT :limit")
     fun recentFlow(limit: Int): Flow<List<JobEntity>>
+
+    // Totals over the whole local table: the activity tiles used to count only the newest rows the
+    // list happened to show, so a bulk run reported a fraction of what it actually did.
+    @Query("SELECT state, COUNT(*) AS n FROM jobs GROUP BY state")
+    fun stateCountsFlow(): Flow<List<StateCount>>
 
     @Query("UPDATE jobs SET state = :state, errorCode = :errorCode WHERE id = :id")
     suspend fun setState(id: Long, state: String, errorCode: String? = null)

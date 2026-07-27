@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.ownsms.sender.BuildConfig
@@ -65,8 +66,15 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     val recent: StateFlow<List<JobEntity>> =
         dao.recentFlow(50).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /** Local job totals per state — counted over the whole table, not just the rows the list shows. */
+    val localCounts: StateFlow<Map<String, Int>> =
+        dao.stateCountsFlow()
+            .map { rows -> rows.associate { it.state to it.n } }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyMap())
+
     // --- server-backed dashboard (account-wide, via api_key) ---
     val serverMessages = MutableStateFlow<List<DevMessage>>(emptyList())
+    val serverCounts = MutableStateFlow<Map<String, Int>>(emptyMap())
     val serverStatus = MutableStateFlow<DeviceStatus?>(null)
     val serverError = MutableStateFlow<String?>(null)
     val hasMoreServer = MutableStateFlow(false)
@@ -83,6 +91,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 serverStatus.value = api.deviceStatus()
                 val page = api.listMessages()
                 serverMessages.value = page.data
+                serverCounts.value = page.counts
                 nextBefore = page.next_before
                 hasMoreServer.value = page.next_before != null
                 serverLoadedOnce = true
